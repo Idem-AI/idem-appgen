@@ -197,7 +197,7 @@ const PreviewIframe: React.FC<PreviewIframeProps> = ({
 
   return (
     <div     className="preview-container w-full h-full relative flex flex-col overflow-hidden">
-      <div className="browser-header bg-white dark:bg-[#1a1a1c] border-b border-gray-200 px-4 py-1 flex items-center space-x-2">
+      <div className="browser-header glass border-b px-4 py-1 flex items-center space-x-2">
         <div className="flex space-x-1.5">
           <div className="w-3 h-3 rounded-full bg-red-500"></div>
           <div className="w-3 h-3 rounded-full bg-yellow-500"></div>

@@ -41,7 +41,7 @@ export const GlobalLimitModal = ({ onLogin }: { onLogin: () => void }) => {
       />
       {!openSetting && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
-          <div className="bg-[#1c1c1c] rounded-lg w-[400px] relative">
+          <div className="glass-card w-[400px] relative">
             <button
               onClick={closeModal}
               className="absolute right-4 top-4 text-gray-400 hover:text-gray-200 transition-colors"

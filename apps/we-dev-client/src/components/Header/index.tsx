@@ -4,7 +4,7 @@ import { FaCode } from "react-icons/fa6";
 
 function Header() {
   return (
-    <header className="min-h-12 flex items-center px-4 h-12 bg-white dark:bg-[#18181a] border-b border-gray-200 dark:border-[#333333]">
+    <header className="min-h-12 flex items-center px-4 h-12 glass border-b">
       <div className="flex-1">
         <ProjectTitle />
       </div>

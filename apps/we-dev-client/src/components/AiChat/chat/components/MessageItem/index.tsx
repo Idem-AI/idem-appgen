@@ -268,7 +268,7 @@ export const CodeBlock = memo(
       <>
         <style>{codeStyles}</style>
         <div className="my-1">
-          <div className="rounded-lg overflow-hidden group border border-[#E1E4E8] dark:border-[#333] shadow-sm">
+          <div className="glass-card overflow-hidden group">
             <div className="flex items-center justify-between px-2 py-0.5 border-b border-[#E1E4E8] dark:border-[#333] bg-[#F6F8FA] dark:bg-[#2d2d2d]">
               <div className="flex items-center gap-2.5">
                 {filePath ? (

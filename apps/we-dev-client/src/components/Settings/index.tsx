@@ -151,7 +151,7 @@ export function Settings({
 
       <div
         className={`
-          relative flex bg-white dark:bg-[#18181a] w-[1000px] h-[650px] rounded-lg shadow-xl
+          relative flex glass-card w-[1000px] h-[650px]
           transition-all duration-300 ease-out
           ${
             isAnimating

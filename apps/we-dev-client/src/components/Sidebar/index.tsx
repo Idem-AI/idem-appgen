@@ -232,11 +232,11 @@ export function Sidebar({
       <div
         className={`
           fixed top-0 left-0 h-full w-[280px]
-          bg-white dark:bg-[#18181a] z-50
+          glass z-50
           transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
           flex flex-col text-[14px]
-          border-r border-gray-200 dark:border-[#333333]
+          border-r
           rounded-tr-xl rounded-br-xl
           overflow-hidden
         `}

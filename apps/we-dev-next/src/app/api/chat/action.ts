@@ -9,6 +9,7 @@ import {
 import type { LanguageModel, Message } from "ai";
 import { modelConfig } from "../model/config";
 import { createDeepSeek } from "@ai-sdk/deepseek";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 
 export const MAX_TOKENS = 16000;
 
@@ -19,7 +20,7 @@ export function getOpenAIModel(baseURL: string, apiKey: string, model: string) {
     (item) => item.modelKey === model
   )?.provider;
   if (provider === "gemini") {
-    const gemini = createGoogle({
+    const gemini = createGoogleGenerativeAI({
       apiKey,
       baseURL,
     });

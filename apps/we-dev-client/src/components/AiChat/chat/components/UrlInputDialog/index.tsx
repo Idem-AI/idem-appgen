@@ -68,7 +68,7 @@ export const UrlInputDialog: React.FC<UrlInputDialogProps> = ({
       {/* Dialog */}
       <div className="flex min-h-full items-center justify-center p-4">
         <div 
-          className="relative w-full max-w-md transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 p-6 text-left shadow-xl transition-all"
+          className="relative w-full max-w-md transform overflow-hidden glass-card p-6 text-left transition-all"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Title */}
