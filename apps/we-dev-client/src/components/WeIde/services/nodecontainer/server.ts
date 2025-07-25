@@ -1,4 +1,4 @@
-const ipcRenderer = window.electron?.ipcRenderer;
+// Version web - pas d'accès à ipcRenderer
 import { getNodeContainerInstance } from './instance';
 
 export async function startDevServer(): Promise<{ output: ReadableStream<any>; exit: Promise<number>; }> {
@@ -29,11 +29,11 @@ export async function startDevServer(): Promise<{ output: ReadableStream<any>; e
   }
 }
 
-// 停止开发服务器
+// Arrêter le serveur de développement - version web stub
 export async function stopDevServer(port: number): Promise<void> {
   try {
-    // @ts-ignore
-    await ipcRenderer.invoke('node-container:stop-server', port);
+    console.warn(`stopDevServer non disponible en mode web (port: ${port})`);
+    return Promise.resolve();
   } catch (error) {
     console.error('Failed to stop dev server:', error);
     throw error;

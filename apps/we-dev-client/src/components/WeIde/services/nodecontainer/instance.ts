@@ -1,100 +1,64 @@
 import { EventEmitter } from '@/components/AiChat/utils/EventEmitter';
-import { useFileStore } from '../../stores/fileStore';
 import type { NodeContainer } from './types';
 
-
-const ipcRenderer = window.electron?.ipcRenderer as any;
-
+// Version web - pas d'accès à ipcRenderer
 let nodeContainerInstance: NodeContainer | null = null;
 let bootPromise: Promise<NodeContainer> | null = null;
 
-// 获取项目根目录
+// Stub pour getProjectRoot
 export async function getProjectRoot() {
-  if (!ipcRenderer) {
-    throw new Error('Electron IPC is not available');
-  }
-  // 从主进程获取应用路径
-  // @ts-ignore
-  return await ipcRenderer.invoke('node-container:get-project-root');
+  console.warn('getProjectRoot non disponible en mode web');
+  return '/web-project';
 }
 
 async function initNodeContainer(): Promise<NodeContainer> {
-  if (!ipcRenderer) {
-    throw new Error('Electron IPC is not available. Are you running in development mode?');
-  }
-
+  console.warn('NodeContainer n\'est pas pleinement fonctionnel en mode web');
+  
   try {
-    // @ts-ignore
-    await ipcRenderer.invoke('node-container:init');
-    const projectRoot = await getProjectRoot();
-
+    const projectRoot = '/web-project';
+    
     const instance = new EventEmitter() as any;
 
     instance.fs = {
       mkdir: async (path: string, options?: { recursive?: boolean }) => {
-        return ipcRenderer.invoke('node-container:mkdir', path, options);
+        console.warn('mkdir non disponible en mode web');
+        return Promise.resolve();
       },
       writeFile: async (path: string, contents: string) => {
-        return ipcRenderer.invoke('node-container:writeFile', path, contents);
+        console.warn('writeFile non disponible en mode web');
+        return Promise.resolve();
       },
       readFile: async (path: string, encoding: string) => {
-        return ipcRenderer.invoke('node-container:readFile', path, encoding);
+        console.warn('readFile non disponible en mode web');
+        return Promise.resolve('');
       },
       readdir: async (path: string, options?: { withFileTypes?: boolean }) => {
-        return ipcRenderer.invoke('node-container:readdir', path, options);
+        console.warn('readdir non disponible en mode web');
+        return Promise.resolve([]);
       }
     };
 
     instance.spawn = async (command: string, args: string[], options?: { cwd?: string }) => {
-      try {
-        console.log('Renderer Process: Spawning command:', command, args, options);
-        const { processId } = await ipcRenderer.invoke('node-container:spawn', command, args, {
-          cwd: options?.cwd || projectRoot
-        });
-        console.log('Renderer Process: Got process ID:', processId);
+      console.warn('spawn non disponible en mode web', { command, args, options });
+      
+      // Créer un stream vide qui se termine immédiatement
+      const stream = new ReadableStream({
+        start(controller) {
+          controller.enqueue(new TextEncoder().encode(`La commande '${command}' n'est pas disponible en mode web\n`));
+          controller.close();
+        }
+      });
 
-        const stream = new ReadableStream({
-          start(controller) {
-            console.log('Renderer Process: Setting up stream listeners');
-            const outputListener = (sdata: any, data: string) => {
-              console.log('Renderer Process: Received output:', sdata);
-              //   controller.enqueue(new TextEncoder().encode(data));
-              controller.enqueue(new TextEncoder().encode(sdata));
-            };
+      // Promise qui se résout immédiatement
+      const exit = Promise.resolve(1);
 
-            const exitListener = (_: any, code: number) => {
-              console.log('Renderer Process: Process exited with code:', code);
-              ipcRenderer.removeListener(`process-output-${processId}`, outputListener);
-              ipcRenderer.removeListener(`process-exit-${processId}`, exitListener);
-              controller.close();
-            };
-
-            console.log('Renderer Process: Adding event listeners for:', processId);
-            ipcRenderer.on(`process-output-${processId}`, outputListener);
-            ipcRenderer.on(`process-exit-${processId}`, exitListener);
-          }
-        });
-
-        const exit = new Promise<number>((resolve) => {
-          const exitListener = (_: any, code: number) => {
-            console.log('Renderer Process: Exit promise resolved with code:', code);
-            ipcRenderer.removeListener(`process-exit-${processId}`, exitListener);
-            resolve(code);
-          };
-          ipcRenderer.on(`process-exit-${processId}`, exitListener);
-        });
-
-        return {
-          output: stream,
-          exit
-        };
-      } catch (error) {
-        console.error('Renderer Process: Spawn error:', error);
-        throw error;
-      }
+      return {
+        output: stream,
+        exit
+      };
     };
 
-    // 保存项目根路径到实例中
+    // Stocker le chemin racine du projet
     instance.projectRoot = projectRoot;
 
     return instance;
@@ -105,36 +69,21 @@ async function initNodeContainer(): Promise<NodeContainer> {
 }
 
 export async function getNodeContainerInstance(): Promise<NodeContainer | null> {
-  if (nodeContainerInstance) return nodeContainerInstance;
-  if (bootPromise) return bootPromise;
-
   try {
-    if (!window.electron) {
-      console.warn('Electron environment not detected. Some features may not work.');
-      return null;
+    // Check if already booted
+    if (nodeContainerInstance) {
+      return nodeContainerInstance;
     }
 
+    // If boot already in progress, return that promise
+    if (bootPromise) {
+      return await bootPromise;
+    }
+
+    // Start boot process
+    console.warn("NodeContainer n'est pas disponible en mode web. Création d'un stub limité.");
     bootPromise = initNodeContainer();
     nodeContainerInstance = await bootPromise;
-
-    if (nodeContainerInstance) {
-      const projectRoot = nodeContainerInstance.projectRoot;
-
-      // 初始化项目根目录
-      await nodeContainerInstance.fs.mkdir(projectRoot, { recursive: true });
-
-      // 挂载初始文件
-      const { files } = useFileStore.getState();
-      for (const [path, contents] of Object.entries(files)) {
-        const fullPath = `${projectRoot}/${path}`;
-        // 创建父目录
-        const parentDir = fullPath.substring(0, fullPath.lastIndexOf('/'));
-        await nodeContainerInstance.fs.mkdir(parentDir, { recursive: true });
-        // 写入文件
-        await nodeContainerInstance.fs.writeFile(fullPath, contents);
-      }
-    }
-
     return nodeContainerInstance;
   } catch (error) {
     console.error('Failed to init NodeContainer:', error);

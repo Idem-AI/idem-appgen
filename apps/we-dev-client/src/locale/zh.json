@@ -113,7 +113,6 @@
       "command": "命令",
       "commandRequired": "请输入命令",
       "config_description": "配置模型上下文协议服务器",
-      "please_use_electron": "请打开https://idem appgen.ai下载客户端版本使用",
       "confirmDelete": "删除服务器",
       "confirmDeleteMessage": "您确定要删除该服务器吗？",
       "deleteError": "删除服务器失败",

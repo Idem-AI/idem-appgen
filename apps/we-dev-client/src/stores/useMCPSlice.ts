@@ -102,11 +102,6 @@ const useMCPStore = create<MCPState>()(
     )
 )
 
-// Listen for server change events from main process
-if (typeof window !== 'undefined' && window.electron) {
-    window.electron.ipcRenderer.on('mcp:servers-changed', (servers: MCPServer[]) => {
-        useMCPStore.getState().setServers(servers)
-    })
-}
+// Version web - pas d'événements IPC depuis le processus principal
 
 export default useMCPStore

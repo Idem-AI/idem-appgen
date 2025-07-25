@@ -32,35 +32,32 @@ const LoginForm = ({ onSuccess, onTabChange }: LoginFormProps) => {
   const [rememberMe, setRememberMeState] = useState(true);
   const { t } = useTranslation();
 
+  // Version web - Gestion du callback de connexion via URL pour les authentifications OAuth
   useEffect(() => {
-    const handleLoginCallback = async (data: { token: string | undefined }) => {
-      const token = typeof data === "object" ? data.token : data;
-
+    // En environnement web, nous utilisons les redirections URL standard pour OAuth
+    // Cette fonction gère le retour après une authentification OAuth externe
+    const handleOAuthCallback = async () => {
+      // Vérifier si l'URL contient un token (après redirection OAuth)
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      
       if (token) {
+        // Nettoyer l'URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        // Enregistrer le token et récupérer les informations utilisateur
         setToken(token);
         const user = await authService.getUserInfo(token);
         setUser(user);
         toast.success("success login");
         onSuccess?.();
-      } else {
       }
     };
-
-    if (window.electron?.ipcRenderer) {
-      window.electron.ipcRenderer.on("login:callback", handleLoginCallback);
-    } else {
-      console.warn("electron.ipcRenderer unavailable");
-    }
-
-    return () => {
-      if (window.electron?.ipcRenderer) {
-        window.electron.ipcRenderer.removeListener(
-          "login:callback",
-          handleLoginCallback
-        );
-      }
-    };
-  }, [setToken, onSuccess]);
+    
+    // Vérifier le token au chargement du composant
+    handleOAuthCallback();
+    
+  }, [setToken, setUser, onSuccess]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

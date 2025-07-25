@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, Dispatch, SetStateAction } from "react";
 import { getContainerInstance } from "./WeIde/services";
 import { Smartphone, Tablet, Laptop, Monitor, ChevronDown } from "lucide-react";
-import { findWeChatDevToolsPath } from "./EditorPreviewTabs";
+// Supprimé l'import de findWeChatDevToolsPath car il n'existe plus
 import { useFileStore } from "./WeIde/stores/fileStore";
 import { useTranslation } from "react-i18next";
 
@@ -31,7 +31,7 @@ const PreviewIframe: React.FC<PreviewIframeProps> = ({
   setShowIframe,
   isMinPrograme,
 }) => {
-  const ipcRenderer = window.electron?.ipcRenderer;
+  // Supprimé la référence à ipcRenderer qui n'existe plus dans la version web
   const [url, setUrl] = useState<string>("");
   const [port, setPort] = useState<string>("");
   const { projectRoot } = useFileStore();
@@ -136,10 +136,8 @@ const PreviewIframe: React.FC<PreviewIframeProps> = ({
   };
 
   const openExternal = () => {
-    window.electron.ipcRenderer.send(
-      "open:external:url",
-      "http://localhost:5174/"
-    );
+    // Version web - ouvrir dans un nouvel onglet au lieu d'utiliser ipcRenderer
+    window.open("http://localhost:5174/", "_blank");
   };
 
   useEffect(() => {
@@ -230,17 +228,9 @@ const PreviewIframe: React.FC<PreviewIframeProps> = ({
                     onClick={async () => {
                       setSelectedSize(size);
                       setIsWindowSizeDropdownOpen(false);
-                      if (isMinPrograme && window.electron) {
-                        const defaultRoot = await ipcRenderer.invoke(
-                          "node-container:get-project-root"
-                        );
-                        const cliPath = await findWeChatDevToolsPath();
-                        const command = `"${cliPath}" preview --project "${projectRoot || defaultRoot}" --auto-port`;
-                        await ipcRenderer.invoke(
-                          "node-container:exec-command",
-                          command
-                        );
-                        // window.electron.ipcRenderer.send("open:external:url", `http://localhost:${port}`);
+                      if (isMinPrograme) {
+                        console.log("La prévisualisation WeChat n'est pas disponible dans la version web");
+                        // Code de prévisualisation web standard sera utilisé par défaut
                       }
                     }
 }

@@ -75,15 +75,13 @@ export const UploadButtons: React.FC<UploadButtonsProps> = ({
       </button>
     )
   );
-  const isElectron = typeof window !== "undefined" && !!window.electron;
-
-  const canUseMCP = isElectron && baseModal.functionCall;
+  const canUseMCP = false;
 
   return (
     <div className="flex items-center">
       <div className="flex items-center gap-2">
-        {/* MCP Tools Button - Disabled when functionCall is false */}
-        {isElectron && (
+        {/* MCP Tools Button - Désactivé en mode web */}
+        {false && (
           <Tooltip
             title={
               <div className="text-xs">

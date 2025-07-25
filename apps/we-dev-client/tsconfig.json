@@ -34,7 +34,6 @@
   ],
   "include": [
     "src",
-    "electron",
     "src/types/*.d.ts"
   ],
 }

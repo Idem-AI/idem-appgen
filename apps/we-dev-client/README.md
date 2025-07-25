@@ -1,21 +1,6 @@
 [![English](https://img.shields.io/badge/README-English-494cad.svg)](https://github.com/idem appgen-dev/idem appgen/blob/main/apps/we-dev-client/README.md) [![中文](https://img.shields.io/badge/README-中文-494cad.svg)](https://github.com/idem appgen-dev/idem appgen/blob/main/apps/we-dev-client/docs/README.zh.md) 
 
-# Super big pit
 
-When you are happy to use 'pnpm i' to install the dependency, it will definitely report an error; please follow the steps below to fix it.
-
-- electron fix：https://github.com/pangxieju/electron-fix
-- mac Configuration modifications：
-
-```
-"postinstall": "electron-rebuild -f -w node-pty --arch=arm64"
-"mac": {
-      "target": "dir",
-      "arch": [
-        "arm64"
-      ]
-    }
-```
 
 - windows:
 

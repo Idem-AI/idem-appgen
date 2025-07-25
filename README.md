@@ -105,9 +105,6 @@ Supports quick start from the root directory.
   2. Select Download for Mac or Windows to download the installer.
   3. Run the installer.
   4. Open the Idem Appgen application.
-## Question
-- If electron reports an error during the second run, please delete the client workspace
-- electron If there is no preview when starting, run pnpm run electron:dev
 
 ## Contact US
 

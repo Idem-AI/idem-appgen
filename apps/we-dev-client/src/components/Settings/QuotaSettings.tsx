@@ -110,12 +110,8 @@ export function QuotaSettings() {
       {/* Buy More Button */}
       <button
         onClick={() => {
-          const url = "https://idem appgen.ai/user";
-          if (window.electron?.ipcRenderer) {
-            window.electron.ipcRenderer.send("open:external:url", url);
-          } else {
-            window.open(url, "_blank", "noopener,noreferrer");
-          }
+          const url = "https://idemappgen.ai/user";
+          window.open(url, "_blank", "noopener,noreferrer");
         }}
         className="mt-8 w-full bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-1.5 transition-colors text-[14px]"
       >

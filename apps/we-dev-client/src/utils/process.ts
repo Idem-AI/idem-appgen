@@ -9,7 +9,6 @@ export function runInstallScript(scriptPath: string): Promise<void> {
 
     const env = {
       ...process.env,
-      ELECTRON_RUN_AS_NODE: "1",
       all_proxy: process.env.all_proxy || process.env.ALL_PROXY || undefined,
       grpc_proxy: process.env.grpc_proxy || process.env.GRPC_PROXY || undefined,
       http_proxy: process.env.http_proxy || process.env.HTTP_PROXY || undefined,

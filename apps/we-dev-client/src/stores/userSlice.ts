@@ -139,15 +139,12 @@ const useUserStore = create<UserState>()(
         localStorage.removeItem("token")
         localStorage.removeItem("rememberMe")
         localStorage.removeItem("user-storage")
-        if (!window.electron) {
-          document.cookie =
-            "token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;"
-          if (process.env.NODE_ENV === "production") {
-            document.cookie =
-              "token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; secure=true;"
-          }
-          fetch('/api/logout')
+        // Version 100% web - gestion des cookies et déconnexion API
+        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;"
+        if (process.env.NODE_ENV === "production") {
+          document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; secure=true;"
         }
+        fetch('/api/logout')
         set(() => ({
           user: null,
           token: null,

@@ -8,9 +8,6 @@ declare global {
     getCurrentDir: () => string;
     Posthog: PostHog
     fileHashMap: Map<string, string>;
-    electron: {
-      ipcRenderer: IpcRenderer;
-    }
     modal: HookAPI
     myAPI: {
       dialog: {
@@ -37,38 +34,8 @@ declare global {
     };
   }
 
-  // IPC related type definitions
-  interface IpcRenderer {
-    invoke(channel: IpcChannel, ...args: any[]): Promise<any>;
-    on(channel: string, listener: (...args: any[]) => void): void;
-    removeListener(channel: string, listener: (...args: any[]) => void): void;
-    send(channel: string, ...args: any[]): void;
-  }
-
   // IPC channel name types
   type IpcChannel = 
-    | 'node-container:init'
-    | 'node-container:mkdir'
-    | 'node-container:writeFile'
-    | 'node-container:readFile'
-    | 'node-container:readdir'
-    | 'node-container:platform'
-    | 'node-container:set-now-path'
-    | 'node-container:get-project-root'
-    | 'node-container:spawn'
-    | 'node-container:wait-exit'
-    | 'node-container:kill-process'
-    | 'node-container:stop-server'
-    | 'node-container:stat'
-    | 'node-container:sync-filesystem'
-    | 'node-container:check-file-exists'
-    | 'node-container:get-parent-paths'
-    | 'node-container:exec-command'
-    | 'terminal:create'
-    | 'terminal:write'
-    | 'terminal:resize'
-    | 'terminal:dispose'
-    | 'open:external:url'
     | 'mcp:list-servers'
     | 'mcp:add-server'
     | 'mcp:update-server'

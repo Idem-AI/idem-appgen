@@ -17,21 +17,25 @@ const MCPSettings: FC = () => {
     const mcpServers = useMCPStore(state => state.getAllServers)
     const [loadingServer, setLoadingServer] = useState<string | null>(null)
 
+    // Version web - fonction adaptée sans accès à window.myAPI.mcp
     const handleDelete = (serverName: string) => {
         if (window.confirm(t('settings.mcp.confirmDeleteMessage'))) {
             try {
-                window.myAPI.mcp.deleteServer(serverName)
-                console.info(t('settings.mcp.deleteSuccess'))
+                // Dans la version web, nous pourrions implémenter ceci via une API REST
+                console.info(`Web mode: ${t('settings.mcp.webUnsupported')}`)
+                // Pour le moment afficher uniquement un message dans la console
             } catch (error: any) {
                 console.error(`${t('settings.mcp.deleteError')}: ${error.message}`)
             }
         }
     }
 
+    // Version web - fonction adaptée sans accès à window.myAPI.mcp
     const handleToggleActive = async (name: string, isActive: boolean) => {
         setLoadingServer(name)
         try {
-            await window.myAPI.mcp.setServerActive(name, isActive)
+            // Dans la version web, nous pourrions implémenter ceci via une API REST
+            console.info(`Web mode: ${t('settings.mcp.webUnsupported')}`)
         } catch (error: any) {
             console.error(`${t('settings.mcp.toggleError')}: ${error.message}`)
         } finally {
@@ -39,17 +43,21 @@ const MCPSettings: FC = () => {
         }
     }
 
-    if(!window.electron) {
-        return <SettingContainer theme={isDarkMode ? 'dark' : 'light'} style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100%',
-            width: '100%'
-        }}>
-            {t('settings.mcp.please_use_electron')}
-        </SettingContainer>;
-    }
+    // Version web - afficher un message informatif au lieu de bloquer l'accès
+    return <SettingContainer theme={isDarkMode ? 'dark' : 'light'} style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100%',
+        width: '100%',
+        gap: '1rem'
+    }}>
+        <div className="text-xl font-medium">{t('settings.mcp.web_mode_title') || "Mode Web"}</div>
+        <p className="text-center max-w-md">
+            {t('settings.mcp.web_mode_message') || "Les fonctionnalités MCP ne sont pas disponibles en mode web. Ces fonctionnalités permettent d'accéder à des ressources locales qui ne sont pas accessibles dans un navigateur standard."}
+        </p>
+    </SettingContainer>
 
     return (
         <SettingContainer theme={isDarkMode ? 'dark' : 'light'}>

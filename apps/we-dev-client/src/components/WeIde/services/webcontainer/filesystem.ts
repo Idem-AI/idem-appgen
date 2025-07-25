@@ -3,7 +3,8 @@ import { useFileStore } from '../../stores/fileStore';
 import { getWebContainerInstance } from './instance';
 import { debounce } from 'lodash';
 
-import {isHiddenNodeModules} from "../../../../../config/electronOrSrcCommonConfig"
+// Définition locale des fichiers masqués pour le mode web
+const isHiddenNodeModules = ['node_modules', '.git', '.DS_Store'];
 
 // Type definitions at the top of the file
 interface FileContent {

@@ -18,24 +18,17 @@ export class DBManager {
   private listeners: Set<DBEventListener> = new Set();
 
   constructor() {
-    // Check environment
-    if (this.isElectron()) {
-      console.log('Running in Electron environment');
-      // Use localStorage as fallback in Electron
+    // Initialize IndexedDB for web environment
+    this.init().then(() => {
+      console.log('DBManager initialization completed');
+    }).catch((error) => {
+      console.error('DBManager initialization failed', error);
+      // Fallback to localStorage if IndexedDB fails
       this.initLocalStorage();
-    } else {
-      this.init().then(() => {
-        console.log('DBManager initialization completed');
-      }).catch((error) => {
-        console.error('DBManager initialization failed', error);
-      });
-    }
+    });
   }
 
-  private isElectron() {
-    // Check if running in Electron environment
-    return window.electron
-  }
+  // Application is now 100% web
 
   private initLocalStorage() {
     // Initialize localStorage
@@ -79,7 +72,8 @@ export class DBManager {
 
   // Get all unique UUIDs
   async getAllUuids(): Promise<string[]> {
-    if (this.isElectron()) {
+    // Utilise le localStorage si IndexedDB n'est pas disponible
+    if (!this.db) {
       const records = JSON.parse(localStorage.getItem('chatRecords') || '[]') as ChatRecord[];
       const uuids = Array.from(new Set(
         records.sort((a, b) => b.time - a.time)
@@ -124,7 +118,8 @@ export class DBManager {
       uuid
     };
 
-    if (this.isElectron()) {
+    // Utilise le localStorage si IndexedDB n'est pas disponible
+    if (!this.db) {
       const records = JSON.parse(localStorage.getItem('chatRecords') || '[]') as ChatRecord[];
       records.push(record);
       localStorage.setItem('chatRecords', JSON.stringify(records));
@@ -148,7 +143,8 @@ export class DBManager {
 
   // Delete all content for specified UUID
   async deleteByUuid(uuid: string): Promise<void> {
-    if (this.isElectron()) {
+    // Utilise le localStorage si IndexedDB n'est pas disponible
+    if (!this.db) {
       const records = JSON.parse(localStorage.getItem('chatRecords') || '[]') as ChatRecord[];
       const filteredRecords = records.filter(record => record.uuid !== uuid);
       localStorage.setItem('chatRecords', JSON.stringify(filteredRecords));
@@ -186,7 +182,8 @@ export class DBManager {
 
   // Read all content for specified UUID
   async getByUuid(uuid: string): Promise<ChatRecord[]> {
-    if (this.isElectron()) {
+    // Utilise le localStorage si IndexedDB n'est pas disponible
+    if (!this.db) {
       const records = JSON.parse(localStorage.getItem('chatRecords') || '[]') as ChatRecord[];
       return records
         .filter(record => record.uuid === uuid)
@@ -208,7 +205,8 @@ export class DBManager {
   }
 
   private async ensureDB(): Promise<void> {
-    if (this.isElectron()) {
+    // Utilise le localStorage si IndexedDB n'est pas disponible
+    if (!this.db) {
       return Promise.resolve();
     }
 
@@ -225,7 +223,8 @@ export class DBManager {
   }
 
   private cleanOldRecords(activeUuids: string[]): void {
-    if (this.isElectron()) {
+    // Utilise le localStorage si IndexedDB n'est pas disponible
+    if (!this.db) {
       const records = JSON.parse(localStorage.getItem('chatRecords') || '[]') as ChatRecord[];
       const filteredRecords = records.filter(record => activeUuids.includes(record.uuid));
       localStorage.setItem('chatRecords', JSON.stringify(filteredRecords));

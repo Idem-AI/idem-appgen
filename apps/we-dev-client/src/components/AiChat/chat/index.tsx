@@ -43,7 +43,7 @@ type TextUIPart = {
      */
     text: string;
 };
-const ipcRenderer = window?.electron?.ipcRenderer;
+// Version web - pas d'ipcRenderer
 export const excludeFiles = [
     "components/weicon/base64.js",
     "components/weicon/icon.css",
@@ -240,7 +240,7 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
                     const historyFiles = {};
                     const oldHistoryFiles = {};
                     // setEmptyFiles();
-                    ipcRenderer && ipcRenderer.invoke("node-container:set-now-path", "");
+                    // Version web - pas de manipulation du chemin via ipcRenderer
                     console.log(latestRecord, 'latestRecord')
                     latestRecord.data.messages.forEach((message) => {
                         const {files: messageFiles} = parseMessage(message.content);
@@ -298,15 +298,13 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
                     clearImages();
                     setIsFirstSend();
                     setIsUpdateSend();
-                    if (ipcRenderer) {
-                        setEmptyFiles();
-                        ipcRenderer.invoke("node-container:set-now-path", "");
-                        setFiles({});
-                        clearImages();
-                        setIsFirstSend();
-                        setIsUpdateSend();
-                        resetTerminals();
-                    }
+                    // Version web - opérations de réinitialisation
+                    setEmptyFiles();
+                    setFiles({});
+                    clearImages();
+                    setIsFirstSend();
+                    setIsUpdateSend();
+                    resetTerminals();
                 }
             }
         });
@@ -482,38 +480,56 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
         },
     });
     const {status, type, projectId} = useUrlData({append});
+    const projectLoadedRef = useRef(false);
     
     // Effet pour charger les données du projet si un projectId est présent dans l'URL
+    // Ne s'exécute qu'une seule fois au chargement initial de la page
     useEffect(() => {
       const loadProjectData = async () => {
-        if (projectId) {
-          try {
-            const project = await getProjectById(projectId);
-            if (project) {
-              // Formater les données du projet pour le chat
-              const webGenService = new WebGenService();
-              const projectPrompt = webGenService.generateWebsitePrompt(project);
-              
-              // Envoyer le prompt formaté au chat
-              append({
-                id: uuidv4(),
-                role: "user",
-                content: projectPrompt
-              });
-              
-              console.log("Project data loaded and sent to chat:", project.name);
-            } else {
-              console.warn("Project not found with ID:", projectId);
-            }
-          } catch (error) {
-            console.error("Error loading project data:", error);
-            toast.error("Erreur lors du chargement des données du projet");
+        // Vérifier si le projet a déjà été chargé ou s'il n'y a pas d'ID de projet
+        if (!projectId || projectLoadedRef.current) {
+          return;
+        }
+        
+        try {
+          // Marquer le projet comme étant en cours de chargement
+          projectLoadedRef.current = true;
+          console.log("Chargement des données du projet avec ID:", projectId);
+          
+          const project = await getProjectById(projectId);
+          if (project) {
+            // Formater les données du projet pour le chat
+            const webGenService = new WebGenService();
+            const projectPrompt = webGenService.generateWebsitePrompt(project);
+            
+            // Envoyer le prompt formaté au chat
+            append({
+              id: uuidv4(),
+              role: "user",
+              content: projectPrompt
+            });
+            
+            console.log("Project data loaded and sent to chat:", project.name);
+          } else {
+            console.warn("Project not found with ID:", projectId);
           }
+        } catch (error) {
+          console.error("Error loading project data:", error);
+          toast.error("Erreur lors du chargement des données du projet");
+          // Si une erreur se produit, réinitialiser le flag pour permettre un nouveau chargement
+          projectLoadedRef.current = false;
         }
       };
       
       loadProjectData();
-    }, [projectId, append]);
+    }, []);
+    
+    // Nettoyage en cas de démontage du composant
+    useEffect(() => {
+      return () => {
+        projectLoadedRef.current = false;
+      };
+    }, []);
 
     // listen to url when official website jumps in
     useEffect(() => {
@@ -528,7 +544,7 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
     useEffect(() => {
         const visibleFun = () => {
             if (isLoading) return;
-            else if (!isLoading && window.electron) {
+            else if (!isLoading) {
                 setTimeout(() => {
                     updateFileSystemNow();
                 }, 600);

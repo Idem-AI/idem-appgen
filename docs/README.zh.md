@@ -95,9 +95,7 @@ chmod +x scripts/wedev-build.sh
   2. 选择 Download for Mac  或 Windows下载二进制包
   3. 开始使用
 
-## 问题
-- electron假如二次运行报错，请删除client workspace
-- electron假如启动的时候没有preview，请运行pnpm run electron:dev
+
 
 ## 联系我们
 

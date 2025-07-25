@@ -174,12 +174,6 @@ class Terminal {
   private handleResize() {
     if (this.fitAddon) {
       this.fitAddon.fit();
-
-      if (this.terminal && window?.electron?.ipcRenderer) {
-        // @ts-ignore
-        const { cols, rows } = this.terminal.options;
-        window.electron.ipcRenderer.invoke("terminal:resize", cols, rows);
-      }
     }
   }
 
@@ -193,11 +187,8 @@ class Terminal {
 
   // Wait for command input
   private async waitCommand(addError?: (error: any) => void) {
-    if (window.electron) {
-      await this.nodeWaitCommand(addError);
-    } else {
-      await this.webWaitCommand(addError);
-    }
+    // Version web uniquement
+    await this.webWaitCommand(addError);
   }
 
   // Command wait in Web environment
@@ -241,91 +232,17 @@ class Terminal {
     });
   }
 
-  // Command wait in Electron environment
+  // Mode web uniquement - la méthode nodeWaitCommand n'est plus nécessaire
   private async nodeWaitCommand(addError?: (error: any) => void) {
-    const instance = await getNodeContainerInstance();
-    const electron = window.electron;
-
-    const { processId } = await electron.ipcRenderer.invoke("terminal:create", {
-      cols: this.terminal?.cols,
-      rows: this.terminal?.rows,
-      processId: this.processId,
-    });
-
-    eventEmitter.emit("terminal:update", processId);
-
-    electron.ipcRenderer.on(`terminal-output-${processId}`, (data: string) => {
-      updateFileSystemNow();
-      this.terminal?.write(data);
-      if ((data.includes("error") || data.includes("failure")) && addError) {
-        addError({
-          message: "compile error",
-          code: this.stripAnsi(data),
-          severity: "error",
-        });
-      }
-      const cleanData = this.stripAnsi(data);
-      const urlMatch = cleanData.match(
-        /localhost:(\d+)|127\.0\.0\.1:(\d+)|0\.0\.0\.0:(\d+)/
-      );
-
-      if (urlMatch) {
-        const port = urlMatch[1] || urlMatch[2] || urlMatch[3];
-        const url = `http://localhost:${port}`;
-        instance?.emit("server-ready", parseInt(port), url);
-      }
-    });
-
-    this.terminal?.onData((data) => {
-      electron.ipcRenderer.invoke("terminal:write", this.processId, data);
-    });
-
-    this.terminal?.onResize(({ cols, rows }) => {
-      electron.ipcRenderer.invoke(
-        "terminal:resize",
-        this.processId,
-        cols,
-        rows
-      );
-    });
+    // Cette méthode est conservée pour la compatibilité mais n'est plus utilisée
+    console.warn('nodeWaitCommand n\'est plus disponible en mode web');
   }
 
   // Execute command
   public async executeCommand(command: string): Promise<CommandResult> {
-    if (window.electron) {
-      return this.executeCommandInElectron(command);
-    } else {
-      return this.executeCommandInWeb(command);
-    }
+    return this.executeCommandInWeb(command);
   }
 
-  // Execute command in Electron
-  private async executeCommandInElectron(
-    command: string
-  ): Promise<CommandResult> {
-    const { invoke } = window.electron!.ipcRenderer;
-    const output: string[] = [];
-
-    if (this.processId) {
-      await invoke("terminal:write", this.processId, command + "\n");
-    }
-
-    window.electron!.ipcRenderer.on(
-      `terminal-output-${this.processId}`,
-      (data: string) => {
-        output.push(data);
-      }
-    );
-
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    return {
-      output,
-      exitCode: 0,
-    };
-  }
-
-  // Execute command in Web
   private async executeCommandInWeb(command: string): Promise<CommandResult> {
     const instance = await getWebContainerInstance();
     const process = await instance.spawn("jsh", ["-c", command], {
@@ -372,10 +289,6 @@ class Terminal {
       console.log("Release fitAddon", this.processId);
       this.fitAddon.dispose(); // Release FitAddon resources
       this.fitAddon = null;
-    }
-
-    if (window.electron) {
-      window.electron.ipcRenderer.invoke("terminal:dispose", this.processId);
     }
 
     window.removeEventListener("resize", this.handleResize);

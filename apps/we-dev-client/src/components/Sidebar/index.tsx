@@ -155,12 +155,9 @@ export function Sidebar({
   };
 
   const openUserCenter = () => {
+    // Version web - ouvrir directement l'URL dans un nouvel onglet
     const url = "https://idem appgen.ai/user";
-    if (window.electron?.ipcRenderer) {
-      window.electron.ipcRenderer.send("open:external:url", url);
-    } else {
-      window.open(url, "_blank", "noopener,noreferrer");
-    }
+    window.open(url, "_blank", "noopener,noreferrer");
   };
   const renderUserSection = () => {
     // First check for user from persistence API

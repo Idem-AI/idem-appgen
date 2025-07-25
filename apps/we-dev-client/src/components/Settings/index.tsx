@@ -10,7 +10,7 @@ import MCPSettings from "@/components/Settings/MCPSettings";
 
 export type SettingsTab = "General" | "Quota" | "MCPServer";
 
-const isElectron = typeof window !== "undefined" && !!window.electron;
+
 export const TAB_KEYS = {
   GENERAL: "General" as const,
   Quota: "Quota" as const,

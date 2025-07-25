@@ -7,41 +7,34 @@ import { ActionButton } from "./Header/ActionButton";
 import { useTranslation } from "react-i18next";
 import useTerminalStore from "@/stores/terminalSlice";
 
+// Composant adapté pour le mode web
 export const OpenDirectoryButton: React.FC = () => {
-  const { setEmptyFiles, setIsFirstSend, setIsUpdateSend, setProjectRoot } =
-    useFileStore();
+  const { setEmptyFiles, setIsFirstSend, setIsUpdateSend } = useFileStore();
   const { resetTerminals } = useTerminalStore();
   const { t } = useTranslation();
+  
+  // En mode web, l'accès au système de fichiers local est limité
+  // Cette fonction pourrait éventuellement être adaptée pour utiliser l'API File System Access
+  // si le navigateur la prend en charge (Chrome notamment)
   const handleOpenDirectory = async () => {
     try {
-      const result = await window.myAPI.dialog.showOpenDialog({
-        properties: ["openDirectory"],
-      });
-      if (!result.canceled && result.filePaths.length > 0) {
-        setEmptyFiles();
-        const selectedPath = result.filePaths[0];
-        await window?.electron?.ipcRenderer.invoke(
-          "node-container:set-now-path",
-          selectedPath
-        );
-        const projectRoot = await window?.electron?.ipcRenderer.invoke(
-          "node-container:get-project-root"
-        );
-        setProjectRoot(selectedPath);
-        console.log("Selected directory:", selectedPath);
-        console.log("Project root:", projectRoot);
-
-        setTimeout(() => {
-          setIsFirstSend();
-          setIsUpdateSend();
-          setTimeout(() => {
-            resetTerminals()
-            updateFileSystemNow();
-          }, 100);
-        }, 100);
-      }
+      // Version web: afficher un message informatif au lieu d'ouvrir un sélecteur de fichiers
+      message.info(t("header.web_mode_info") || "Cette fonctionnalité n'est pas disponible en mode web");
+      
+      // Pour une future implémentation web native:
+      // Ici, on pourrait utiliser l'API File System Access si disponible
+      // https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API
+      // Exemple:
+      // if ('showDirectoryPicker' in window) {
+      //   try {
+      //     const dirHandle = await window.showDirectoryPicker();
+      //     // Traitement des fichiers via l'API FileSystemDirectoryHandle
+      //   } catch (e) {
+      //     console.error("L'utilisateur a annulé ou le navigateur ne prend pas en charge cette fonctionnalité");
+      //   }
+      // }
     } catch (error) {
-      console.error("Failed to open directory:", error);
+      console.error("Erreur:", error);
       message.error(t("header.error.open_directory"));
     }
   };

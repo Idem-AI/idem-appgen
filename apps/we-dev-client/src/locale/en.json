@@ -128,7 +128,6 @@
       "command": "Command",
       "commandRequired": "Please enter a command",
       "config_description": "Configure Model Context Protocol servers",
-      "please_use_electron": "Please open https://idem appgen.ai to download the client version",
       "confirmDelete": "Delete Server",
       "confirmDeleteMessage": "Are you sure you want to delete the server?",
       "deleteError": "Failed to delete server",

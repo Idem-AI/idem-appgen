@@ -4,16 +4,15 @@ import useUserStore from "@/stores/userSlice";
 import i18n from "@/utils/i18";
 import {useEffect} from "react"
 import useMCPStore from "@/stores/useMCPSlice";
-const electron = window.electron;
+// Version web - pas d'accès à Electron
 const useInit = (): { isDarkMode: boolean } => {
     const {isDarkMode, setTheme} = useThemeStore()
     const {setUser,fetchUser} = useUserStore()
     const {closeLoginModal} = useUserStore();
     const servers = useMCPStore(state => state.servers)
     useEffect(() => {
-        if (electron) {
-            electron.ipcRenderer.send('mcp:servers-from-renderer', servers)
-        }
+        // Version web - pas d'envoi vers MCP
+        console.log('MCP servers not available in web mode');
     }, []) 
 
     // Copy optimization
@@ -76,10 +75,8 @@ const useInit = (): { isDarkMode: boolean } => {
             };
         }
 
-        window?.electron?.ipcRenderer.invoke(
-            "node-container:set-now-path",
-            ""
-        )
+        // Version web - pas d'accès au système de fichiers local
+        console.log('Local filesystem not available in web mode');
 
         const settingsConfig = JSON.parse(
             localStorage.getItem("settingsConfig") || "{}"
@@ -96,27 +93,9 @@ const useInit = (): { isDarkMode: boolean } => {
             // Save to local settings
         }
 
-        // Apply stored proxy settings (if any)
-        if (window.electron && settingsConfig.proxyType) {
-            console.log('Applying proxy settings on startup:', settingsConfig.proxyType, settingsConfig.customProxy);
-            
-            // Apply settings based on different proxy types
-            if (settingsConfig.proxyType === 'system') {
-                window.electron.ipcRenderer.send('set-proxy', {
-                    type: 'system',
-                    customProxy: undefined
-                });
-            } else if (settingsConfig.proxyType === 'custom' && settingsConfig.customProxy) {
-                window.electron.ipcRenderer.send('set-proxy', {
-                    type: 'custom',
-                    customProxy: settingsConfig.customProxy
-                });
-            } else if (settingsConfig.proxyType === 'none') {
-                window.electron.ipcRenderer.send('set-proxy', {
-                    type: 'none',
-                    customProxy: undefined
-                });
-            }
+        // Version web - pas de gestion de proxy système
+        if (settingsConfig.proxyType) {
+            console.log('Proxy settings not available in web mode');
         }
 
         // Initialize user info to ensure user-related tables are created
