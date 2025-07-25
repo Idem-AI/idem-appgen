@@ -1,34 +1,9 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import acceptLanguage from "accept-language";
-import { locales, Language } from "./utils/lang";
-import createIntlMiddleware from 'next-intl/middleware';
+import { locales } from "./utils/lang";
 
 acceptLanguage.languages(locales)
-const intlMiddleware = createIntlMiddleware({
-  locales,
-  defaultLocale: Language.English,
-  localePrefix: "always",
-  localeDetection: true,
-  pathnames: {
-    '/': {
-      en: '/',
-      'zh-CN': '/'
-    },
-    '/user': {
-      en: '/user',
-      'zh-CN': '/user'
-    },
-    '/login': {
-      en: '/login',
-      'zh-CN': '/login'
-    },
-    '/register': {
-      en: '/register',
-      'zh-CN': '/register'
-    }
-  }
-});
 
 // CORS configuration
 const CORS_HEADERS = {

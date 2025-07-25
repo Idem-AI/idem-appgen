@@ -42,7 +42,7 @@
     ".next/types/**/*.ts",
     "./src/utils/messagepParseJson.ts",
     "next.config.mjs"
-, "src/components/Postcard/postcard.jsx"  ],
+, "src/components/Postcard/postcard.jsx", "../we-dev-client/src/components/AiChat/chat/services/appGenService.ts"  ],
   "exclude": [
     "node_modules"
   ]
