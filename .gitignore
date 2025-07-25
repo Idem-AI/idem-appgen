@@ -12,7 +12,6 @@
 .DS_Store
 dist
 **/dist-electron
-
 **/certs
 
 *.log
@@ -64,3 +63,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+apps/we-dev-next/public/wedev_public/
+apps/we-dev-client/node-jiti
