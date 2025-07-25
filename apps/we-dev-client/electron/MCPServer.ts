@@ -53,7 +53,7 @@ export default class MCPServiceManager extends EventEmitter {
             this.readyState.resolve = null
         }
 
-        // 立即通知渲染进程服务器列表已更新
+        // Immediately notify renderer process that server list has been updated
         this.notifyServersChanged(servers)
 
         // Initialize if not already initialized
@@ -102,22 +102,22 @@ export default class MCPServiceManager extends EventEmitter {
         return this.initPromise
     }
 
-    // 单独的SDK加载方法，更清晰的职责分离
+    // Separate SDK loading method for clearer separation of responsibilities
     private async loadSDKComponents(): Promise<void> {
-        // 使用Promise.all并行加载所有SDK组件
+        // Use Promise.all to load all SDK components in parallel
         const [client, stdio, sse] = await Promise.all([
             this.importModule('@modelcontextprotocol/sdk/client/index.js'),
             this.importModule('@modelcontextprotocol/sdk/client/stdio.js'),
             this.importModule('@modelcontextprotocol/sdk/client/sse.js')
         ]);
 
-        // 赋值给类属性
+        // Assign to class properties
         this.Client = client.Client;
         this.stdioTransport = stdio.StdioClientTransport;
         this.sseTransport = sse.SSEClientTransport;
     }
 
-    // 包装导入逻辑，增强错误处理和调试能力
+    // Wrap import logic with enhanced error handling and debugging capabilities
     private async importModule(path: string): Promise<any> {
         try {
             return await import(path);
@@ -274,7 +274,7 @@ export default class MCPServiceManager extends EventEmitter {
         try {
             mainWindow.webContents.send('mcp:servers-changed', servers)
         } catch (error) {
-            console.error('[MCP] 发送服务器变更通知失败:', error)
+            console.error('[MCP] Failed to send server change notification:', error)
         }
     }
 
@@ -326,7 +326,7 @@ export default class MCPServiceManager extends EventEmitter {
 
                 console.info(`[MCP] Starting server with command: ${cmd} ${args ? args.join(' ') : ''}`)
                 const mirrorEnv = this.getMirrorEnvironment()
-                // 获取镜像设置
+                // Get mirror settings
                 const fullEnv = {
                     PATH: this.getEnhancedPath(process.env.PATH || ''),
                     ...mirrorEnv,
@@ -521,12 +521,12 @@ export default class MCPServiceManager extends EventEmitter {
      * Get enhanced PATH including common tool locations
      */
     private getEnhancedPath(originalPath: string): string {
-        // 将原始 PATH 按分隔符分割成数组
+        // Split original PATH by delimiter into array
         const pathSeparator = process.platform === 'win32' ? ';' : ':'
         const existingPaths = new Set(originalPath.split(pathSeparator).filter(Boolean))
         const homeDir = process.env.HOME || process.env.USERPROFILE || ''
 
-        // 定义要添加的新路径
+        // Define new paths to add
         const newPaths: string[] = []
         switch (process.platform) {
             case 'darwin':
@@ -566,14 +566,14 @@ export default class MCPServiceManager extends EventEmitter {
                 break;
         }
 
-        // 只添加不存在的路径
+        // Only add paths that don't exist
         newPaths.forEach((path) => {
             if (path && !existingPaths.has(path)) {
                 existingPaths.add(path)
             }
         })
 
-        // 转换回字符串
+        // Convert back to string
         return Array.from(existingPaths).join(pathSeparator)
     }
 
@@ -585,7 +585,7 @@ export default class MCPServiceManager extends EventEmitter {
             const env: Record<string, string> = {}
 
             try {
-                // 尝试从主进程获取设置
+                // Try to get settings from main process
                 let settings: {
                     nodeMirror?: string;
                     customNodeMirror?: string;
@@ -600,7 +600,7 @@ export default class MCPServiceManager extends EventEmitter {
                     }
                 }
 
-                // 使用与GeneralSettings组件相同的默认值逻辑
+                // Use the same default value logic as GeneralSettings component
                 const settingsWithDefaults = {
                     nodeMirror: settings.nodeMirror || 'https://registry.npmjs.org/',
                     customNodeMirror: settings.customNodeMirror || '',
@@ -608,7 +608,7 @@ export default class MCPServiceManager extends EventEmitter {
                     customPythonMirror: settings.customPythonMirror || '',
                 }
 
-                // 添加npm镜像设置
+                // Add npm mirror settings
                 const nodeMirror = settingsWithDefaults.nodeMirror === 'custom' && settingsWithDefaults.customNodeMirror
                     ? settingsWithDefaults.customNodeMirror
                     : settingsWithDefaults.nodeMirror
@@ -617,7 +617,7 @@ export default class MCPServiceManager extends EventEmitter {
                     env.npm_config_registry = nodeMirror
                 }
 
-                // 添加Python镜像设置
+                // Add Python mirror settings
                 const pythonMirror = settingsWithDefaults.pythonMirror === 'custom' && settingsWithDefaults.customPythonMirror
                     ? settingsWithDefaults.customPythonMirror
                     : settingsWithDefaults.pythonMirror

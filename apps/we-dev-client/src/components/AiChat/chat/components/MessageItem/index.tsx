@@ -10,8 +10,8 @@ import useUserStore from "../../../../../stores/userSlice";
 import useThemeStore from "@/stores/themeSlice";
 import hljs from "highlight.js";
 import remarkGfm from "remark-gfm";
-import "highlight.js/styles/github.css"; // 亮色主题
-import "highlight.js/styles/github-dark.css"; // 暗色主题
+import "highlight.js/styles/github.css"; // Light theme
+import "highlight.js/styles/github-dark.css"; // Dark theme
 import { message } from "antd";
 import { useTranslation } from 'react-i18next';
 
@@ -53,7 +53,7 @@ function filterContent(message) {
   let cloneMessage
   if (message.role === 'user') {
     cloneMessage = JSON.parse(JSON.stringify(message))
-    // 使用正则表达式移除<weD2c>标签及其内容，添加 s 标志以匹配多行内容
+    // Use regex to remove <weD2c> tags and their content, add s flag to match multiline content
     const weD2cRegex = /<weD2c>[\s\S]*?<\/weD2c>/g;
     cloneMessage.content = cloneMessage.content.replace(weD2cRegex, '');
     cloneMessage.parts = cloneMessage.parts.map(item => {
@@ -66,19 +66,19 @@ function filterContent(message) {
   }
   return cloneMessage ? cloneMessage : message;
 }
-// 添加处理流式parts的函数
+// Add function to handle streaming parts
 export const processStreamParts = (parts: Message["parts"]): string => {
   let result = "";
   let thinkContent = "";
 
-  // 首先处理所有reasoning类型的内容
+  // First process all reasoning type content
   parts?.forEach((part) => {
     if (part.type === "reasoning") {
       thinkContent += part.reasoning;
     }
   });
 
-  // 如果有reasoning内容，将其转换为markdown引用格式
+  // If there is reasoning content, convert it to markdown quote format
   if (thinkContent) {
     result +=
       thinkContent
@@ -87,10 +87,10 @@ export const processStreamParts = (parts: Message["parts"]): string => {
         .join("\n") + "\n\n";
   }
 
-  // 添加其他类型的内容
+  // Add other types of content
   parts?.forEach((part) => {
     if (part.type === "text") {
-      // 检查是否包含think标签，如果有则进行处理
+      // Check if it contains think tags, if so, process them
       if (isThinkContent(part.text)) {
         result += processThinkContent(part.text);
       } else {
@@ -134,12 +134,12 @@ const getArtifactTitle = (content: string) => {
   return match ? match[1] : "Task";
 };
 
-// 如果生成结束了，user在最后，就要展示重试
+// If generation is finished and user is last, show retry
 const isShowRetry = (isUser: boolean, isLoading: boolean, isEndMessage:boolean) => {
   return isUser && !isLoading && isEndMessage; 
 };
 
-// 添加图片预览组件
+// Add image preview component
 const ImagePreview = ({
   src,
   onClose,
@@ -182,25 +182,25 @@ const ImagePreview = ({
   );
 };
 
-// 添加获取首字母的辅助函数
+// Add helper function to get initials
 const getInitial = (name: string | null | undefined): string => {
   if (!name) return "U";
 
-  // 尝试获取第一个英文字母
+  // Try to get the first English letter
   const englishMatch = name.match(/[a-zA-Z]/);
   if (englishMatch) {
     return englishMatch[0].toUpperCase();
   }
 
-  // 如果没有英文字母，返回第一个字符
+  // If no English letters, return the first character
   return name.charAt(0).toUpperCase();
 };
 
-// 添加自定义样式处理
+// Add custom style processing
 const customHighlight = (code: string, language: string) => {
   try {
     if (language.toLowerCase() === 'json') {
-      // 自定义 JSON 语法高亮
+      // Custom JSON syntax highlighting
       const jsonStr = code.trim();
       return jsonStr.replace(
         /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,

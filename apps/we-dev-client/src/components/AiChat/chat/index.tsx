@@ -275,7 +275,7 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
             }
         } catch (error) {
             console.error("Failed to load chat history:", error);
-            toast.error("加载聊天记录失败");
+            toast.error("Failed to load chat history");
         }
     };
 
@@ -474,7 +474,7 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
             }
             // 添加对 Ollama 错误的处理
             if (baseModal.from === "ollama") {
-                toast.error("Ollama 服务器连接失败，请检查配置");
+                toast.error("Ollama server connection failed, please check configuration");
             }
         },
     });
@@ -775,9 +775,9 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
             addImages(uploadResults);
 
             if (uploadResults.length === 1) {
-                toast.success("图片已添加到输入框");
+                toast.success("Image added to input box");
             } else {
-                toast.success(`${uploadResults.length} 张图片已添加到输入框`);
+                toast.success(`${uploadResults.length} images added to input box`);
             }
         } catch (error) {
             console.error("Failed to process dropped images:", error);

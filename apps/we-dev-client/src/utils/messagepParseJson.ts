@@ -3,7 +3,7 @@ interface ParsedMessage {
   files?: Record<string, string>;
 }
 
-// 预编译正则表达式
+// Pre-compiled regular expressions
 const BOLT_ACTION_REGEX =
   /<boltAction type="file" filePath="([^"]+)">([\s\S]*?)<\/boltAction>/g;
 

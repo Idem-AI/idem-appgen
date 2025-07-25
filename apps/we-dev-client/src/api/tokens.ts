@@ -19,7 +19,7 @@ export async function getTokenUsage(token: string): Promise<TokenUsage | null> {
     }
     return await response.json();
   } catch (error) {
-    message.error("获取使用量失败");
+    message.error("Failed to get usage");
     return null;
   }
 }

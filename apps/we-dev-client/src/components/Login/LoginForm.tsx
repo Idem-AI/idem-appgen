@@ -92,8 +92,8 @@ const LoginForm = ({ onSuccess, onTabChange }: LoginFormProps) => {
 
       setToken(data.token);
 
-      // TODO 这里最好加一个loading
-      // 拿到了 token 之后，再去fetchUser
+      // TODO It's better to add a loading here
+      // After getting the token, then fetchUser
       const user = await fetchUser();
 
       if (!response.ok) {
@@ -168,7 +168,7 @@ const LoginForm = ({ onSuccess, onTabChange }: LoginFormProps) => {
               />
               {t("login.remember_me")}
             </label>
-            {/* 没有邮箱验证码，暂时先注释，目前功能是修改密码（没问题） */}
+            {/* No email verification code, temporarily commented out, current function is password reset (no problem) */}
             {/* <button onClick={() => onTabChange("forgot")} className="text-[#666] hover:text-[#3B82F6] transition-colors">
               {t("login.forgot_password")}
             </button> */}

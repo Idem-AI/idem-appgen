@@ -104,15 +104,15 @@ export function HeaderActions() {
         try {
           const zip = new JSZip();
           
-          // 使用新的递归函数获取所有文件
+          // Use new recursive function to get all files
           await getAllFiles(webcontainer, "dist", zip);
 
-          // 生成并下载 zip 文件
+          // Generate and download zip file
           const blob = await zip.generateAsync({ type: "blob" });
           const formData = new FormData();
           formData.append('file', new File([blob], 'dist.zip', { type: 'application/zip' }));
           
-          // 发送请求
+          // Send request
           const response = await fetch(`${API_BASE}/api/deploy`, {
             method: "POST",
             body: formData,

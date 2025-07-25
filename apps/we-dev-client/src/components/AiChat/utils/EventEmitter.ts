@@ -9,7 +9,7 @@ export class EventEmitter {
     }
     this.events[event].push(callback);
     
-    // 返回取消订阅函数
+    // Return unsubscribe function
     return () => {
       this.events[event] = this.events[event].filter(cb => cb !== callback);
     };

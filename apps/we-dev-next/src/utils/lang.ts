@@ -9,7 +9,7 @@ export const LanguageNativeNames: { name: string; locale: Language }[] = [
     locale: Language.English,
   },
   {
-    name: "简体中文",
+    name: "Simplified Chinese",
     locale: Language["Chinese(Simplified)"],
   },
 ];

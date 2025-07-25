@@ -37,7 +37,7 @@ declare global {
     };
   }
 
-  // IPC 相关类型定义
+  // IPC related type definitions
   interface IpcRenderer {
     invoke(channel: IpcChannel, ...args: any[]): Promise<any>;
     on(channel: string, listener: (...args: any[]) => void): void;
@@ -45,7 +45,7 @@ declare global {
     send(channel: string, ...args: any[]): void;
   }
 
-  // IPC 通道名称类型
+  // IPC channel name types
   type IpcChannel = 
     | 'node-container:init'
     | 'node-container:mkdir'
@@ -83,7 +83,7 @@ declare global {
     | 'app:install-uv-binary'
     | 'app:install-bun-binary';
 
-  // 文件系统相关类型
+  // File system related types
   interface FileStats {
     isDirectory: boolean;
     isFile: boolean;
@@ -91,7 +91,7 @@ declare global {
     mtime: Date;
   }
 
-  // 进程相关类型
+  // Process related types
   interface SpawnOptions {
     cwd?: string;
     processId?: string;
@@ -107,14 +107,14 @@ declare global {
     processId: string;
   }
 
-  // 父路径返回类型
+  // Parent path return type
   interface ParentPaths {
     parentPath: string;
     grandParentPath: string;
     lastGrandParentPath: string;
   }
 
-  // PTY 进程类型
+  // PTY process type
   interface PtyProcess {
     write(data: string): void;
     resize(cols: number, rows: number): void;

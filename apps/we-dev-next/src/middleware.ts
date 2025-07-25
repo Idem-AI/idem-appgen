@@ -30,7 +30,7 @@ const intlMiddleware = createIntlMiddleware({
   }
 });
 
-// CORS 配置
+// CORS configuration
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET,OPTIONS,PATCH,DELETE,POST,PUT",
@@ -43,7 +43,7 @@ const CORS_HEADERS = {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-    // 处理 CORS 预检请求
+    // Handle CORS preflight requests
     if (request.method === "OPTIONS") {
       return new NextResponse(null, { status: 200, headers: CORS_HEADERS });
     }

@@ -30,7 +30,7 @@ export async function streamResponse(
         tools: toolList,
         toolCallStreaming: true,
         onError: (err: any) => {
-            // 获取错误信息，优先使用 cause 属性
+            // Get error information, prioritize cause property
             const errorCause = err?.cause?.message || err?.cause || err?.error?.message
             const msg = errorCause || err?.errors?.[0]?.responseBody || JSON.stringify(err);
 
@@ -38,7 +38,7 @@ export async function streamResponse(
                 throw new Error(msg);
             }
             const error = new Error(msg || JSON.stringify(err));
-            error.cause = msg; // 保存原始错误信息到 cause
+            error.cause = msg; // Save original error information to cause
             throw error;
         },
         onFinish: async (response) => {

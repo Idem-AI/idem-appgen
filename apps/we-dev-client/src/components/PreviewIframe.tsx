@@ -58,7 +58,7 @@ const PreviewIframe: React.FC<PreviewIframeProps> = ({
   }, []);
 
   const handleRefresh = () => {
-    console.log("刷新 handleRefresh", iframeRef.current);
+    console.log("Refresh handleRefresh", iframeRef.current);
     if (iframeRef.current) {
       iframeRef.current.src = iframeRef.current.src;
     }
@@ -285,7 +285,7 @@ const PreviewIframe: React.FC<PreviewIframeProps> = ({
             <button
               onClick={handleZoomOut}
               className="p-1 rounded hover:bg-gray-100 dark:hover:bg-[#2c2c2c] text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-              title="缩小"
+              title="Zoom out"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -309,7 +309,7 @@ const PreviewIframe: React.FC<PreviewIframeProps> = ({
             <button
               onClick={handleZoomIn}
               className="p-1 rounded hover:bg-gray-100 dark:hover:bg-[#2c2c2c] text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-              title="放大"
+              title="Zoom in"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

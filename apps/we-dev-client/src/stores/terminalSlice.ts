@@ -41,8 +41,8 @@ const useTerminalStore = create<TerminalState>((set, get) => ({
     return terminalArray[index];
   },
 
-  // 暂不支持 从其他地方 非法地注册终端
-  // 注册时，必须有明确的ref钩子，防止出现未知错误
+  // Currently not supporting illegal terminal registration from other places
+  // When registering, must have clear ref hooks to prevent unknown errors
   newTerminal: async (cb = () => { }) => {
 
     const ref = React.createRef<HTMLDivElement>()
@@ -51,15 +51,15 @@ const useTerminalStore = create<TerminalState>((set, get) => ({
     cb(t)
   },
 
-  // 添加终端
+  // Add terminal
   // addTerminal: async (container: HTMLElement) => {
   addTerminal: async (containerRef: React.RefObject<HTMLDivElement>) => {
 
-    // 实例化一个新的终端
+    // Instantiate a new terminal
     const terminal = new weTerminal(null);
 
     const processId = Math.random().toString(36).substr(2, 9);;
-    // 初始化得到 processId
+    // Initialize to get processId
     await terminal.initialize(containerRef.current, processId)
 
     terminal.setContainerRef(containerRef);

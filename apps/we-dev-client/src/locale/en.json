@@ -343,9 +343,9 @@
     },
     "prompts": {
       "base": "Please generate based on the uploaded design",
-      "react": "React code using TypeScript and Tailwind CSS, project must have a start entry, and ensure the project can run, and ensure the code is符合最佳实践和性能优化。",
+      "react": "React code using TypeScript and Tailwind CSS, project must have a start entry, and ensure the project can run, and ensure the code follows best practices and performance optimization.",
       "vue": "Vue3 code using TypeScript and Composition API, with Tailwind CSS styling, ensuring Vue best practices.",
-      "miniprogram": "WeChat Mini Program code using the native framework with WXSS styling, following Mini Program development standards and best practices. Use rpx units for the interface, and remove the status bar if present in the design. 写小程序注意样式和宽度"
+      "miniprogram": "WeChat Mini Program code using the native framework with WXSS styling, following Mini Program development standards and best practices. Use rpx units for the interface, and remove the status bar if present in the design. Pay attention to styles and width when writing mini programs"
     }
   },
   "update": {

@@ -27,9 +27,9 @@ export class ProxyManager {
     }
 
     private async monitorSystemProxy(): Promise<void> {
-        // 清除已存在的监控间隔
+        // Clear existing monitoring interval
         this.clearSystemProxyMonitor()
-        // 设置新的监控间隔
+        // Set new monitoring interval
         this.systemProxyInterval = setInterval(async () => {
             await this.setSystemProxy()
         }, 10000)

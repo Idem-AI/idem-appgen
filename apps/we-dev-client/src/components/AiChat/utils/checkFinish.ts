@@ -23,7 +23,7 @@ export const checkFinish = (text: string, append?: (message: Message | CreateMes
 };
 
 export const checkExecList = (messages: Message[]) => {
-  // type里面无限制
+  // No restrictions in type
   setTimeout(() => {
     const shellCommandRegex =
       /<boltAction\s+type=["'](shell|start)["']\s*>([\s\S]*?)<\/boltAction>/g;

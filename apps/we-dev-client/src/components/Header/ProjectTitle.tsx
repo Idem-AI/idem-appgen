@@ -21,7 +21,7 @@ export function ProjectTitle() {
     );
   };
 
-  // 获取聊天数量
+  // Get chat count
   const loadChatCount = async () => {
     const uuids = await db.getAllUuids();
     setChatCount(uuids.length);
@@ -29,7 +29,7 @@ export function ProjectTitle() {
 
   useEffect(() => {
     loadChatCount();
-    // 订阅数据库更新
+    // Subscribe to database updates
     const unsubscribe = db.subscribe(loadChatCount);
     return () => {
       unsubscribe();

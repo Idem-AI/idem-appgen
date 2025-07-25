@@ -734,7 +734,7 @@ function createWindow() {
       }`
     );
 
-    // 处理代理设置
+    // Handle proxy settings
     ipcMain.on("set-proxy", async (_, { type, customProxy }) => {
       try {
         const config = {

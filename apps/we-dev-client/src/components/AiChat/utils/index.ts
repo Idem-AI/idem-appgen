@@ -1,4 +1,4 @@
-// 添加解析上下文的函数
+// Add function to parse context
 export const parseFileFromContext = (filePath: string, content: string) => {
     const regex = new RegExp(
       `<boltAction[^>]*filePath="${filePath}"[^>]*>([\\s\\S]*?)<\\/boltAction>`

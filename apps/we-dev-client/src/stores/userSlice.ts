@@ -22,13 +22,13 @@ export interface User {
   wechatId: string
   avatar?: string
   userQuota: {
-    // 用户当前拥有的配额
+    // User's current quota
     quota: number
     resetTime: Date
     tierType: TierType
-    // 加油包的配额
+    // Booster package quota
     refillQuota: number
-    // 该周期的额度
+    // Quota for this cycle
     usedQuota: number
     quotaTotal: number
 

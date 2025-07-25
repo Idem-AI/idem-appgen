@@ -1,6 +1,6 @@
 
 export const uploadImage = async (file: File) => {
-  // 使用FileReader将文件转换为Base64
+  // Use FileReader to convert file to Base64
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     

@@ -146,13 +146,13 @@ const debouncedUpdateFileSystem = debounce(async () => {
   if (!instance) return;
 
   try {
-    // 从根目录开始读取
+    // Start reading from root directory
     const files = await readDirRecursive(instance, '/', filesObj);
 
-    // 更新文件存储
+    // Update file storage
     if (files.length > 0) {
       // console.log('Updating files:', files.map(f => f.path));
-      // 逐个更新文件
+      // Update files one by one
       for (const file of files) {
         updateContent(file.path.substring(1), file.content, true, true);
       }

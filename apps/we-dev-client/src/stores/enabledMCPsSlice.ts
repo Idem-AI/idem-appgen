@@ -24,10 +24,10 @@ const useEnabledMCPsStore = create<EnabledMCPsState>()(
                     const isCurrentlyEnabled = state.enabledMCPs.some(s => s.name === server.name)
                     
                     if (isCurrentlyEnabled) {
-                        // 如果已启用，则从列表中移除
+                        // If already enabled, remove from list
                         return { enabledMCPs: state.enabledMCPs.filter(s => s.name !== server.name) }
                     } else {
-                        // 如果未启用，则添加到列表中
+                        // If not enabled, add to list
                         return { enabledMCPs: [...state.enabledMCPs, server] }
                     }
                 })
