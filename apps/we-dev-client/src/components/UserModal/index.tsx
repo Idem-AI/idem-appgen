@@ -67,7 +67,7 @@ export const GlobalLimitModal = ({ onLogin }: { onLogin: () => void }) => {
                     onClick={() => {
                       setOpenSetting(true);
                     }}
-                    className="flex-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-2 text-sm font-medium transition-colors"
+                    className="flex-1 inner-button text-sm font-medium"
                   >
                     {t("common.open_directory_quota")}
                   </button>
@@ -77,7 +77,7 @@ export const GlobalLimitModal = ({ onLogin }: { onLogin: () => void }) => {
                       onLogin();
                       closeModal();
                     }}
-                    className="flex-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-2 text-sm font-medium transition-colors"
+                    className="flex-1 inner-button text-sm font-medium"
                   >
                     {t("common.login")}
                   </button>

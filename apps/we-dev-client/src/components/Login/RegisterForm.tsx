@@ -109,9 +109,7 @@ const RegisterForm = ({ onSuccess, onTabChange }: RegisterFormProps) => {
             type="text"
             placeholder="Username"
             required
-            className="w-full bg-white dark:bg-[#222] border border-gray-200 dark:border-[#333] rounded-xl py-3.5 px-11 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666]
-              focus:outline-none focus:border-[#3B82F6] focus:bg-gray-50 dark:focus:bg-[#1A1A1A] focus:ring-1 focus:ring-[#3B82F6]
-              transition-all duration-300"
+            className="input pl-11"
           />
         </div>
         <div className="relative group">
@@ -123,9 +121,7 @@ const RegisterForm = ({ onSuccess, onTabChange }: RegisterFormProps) => {
             type="email"
             placeholder="Email"
             required
-            className="w-full bg-white dark:bg-[#222] border border-gray-200 dark:border-[#333] rounded-xl py-3.5 px-11 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666]
-              focus:outline-none focus:border-[#3B82F6] focus:bg-gray-50 dark:focus:bg-[#1A1A1A] focus:ring-1 focus:ring-[#3B82F6]
-              transition-all duration-300"
+            className="input pl-11"
           />
         </div>
         <div className="relative group">
@@ -137,9 +133,7 @@ const RegisterForm = ({ onSuccess, onTabChange }: RegisterFormProps) => {
             type="password"
             placeholder="Password"
             required
-            className="w-full bg-white dark:bg-[#222] border border-gray-200 dark:border-[#333] rounded-xl py-3.5 px-11 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-[#666]
-              focus:outline-none focus:border-[#3B82F6] focus:bg-gray-50 dark:focus:bg-[#1A1A1A] focus:ring-1 focus:ring-[#3B82F6]
-              transition-all duration-300"
+            className="input pl-11"
           />
         </div>
         <div className="relative group">

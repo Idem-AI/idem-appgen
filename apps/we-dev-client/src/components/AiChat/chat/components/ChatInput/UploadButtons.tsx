@@ -66,7 +66,7 @@ export const UploadButtons: React.FC<UploadButtonsProps> = ({
         ref={ref}
         {...props}
         className={classNames(
-          "p-2 text-gray-600 dark:text-gray-500 flex hover:text-gray-900 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-500/20 rounded-lg transition-all duration-200",
+          "outer-button p-2 flex",
           props.disabled && "opacity-50 cursor-not-allowed",
           props.className
         )}
@@ -124,7 +124,7 @@ export const UploadButtons: React.FC<UploadButtonsProps> = ({
           <button
             type="button"
             onClick={() => setIsFigmaModalOpen(true)}
-            className="p-2 text-gray-600 dark:text-gray-500 flex hover:text-gray-900 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-500/20 rounded-lg transition-all duration-200"
+            className="outer-button p-2 flex"
           >
             <Figma className="w-4 h-4" />
           </button>

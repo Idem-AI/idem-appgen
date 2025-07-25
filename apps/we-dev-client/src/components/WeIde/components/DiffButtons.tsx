@@ -10,7 +10,7 @@ const DiffButtons: React.FC<DiffButtonsProps> = ({ onAccept, onCancel }) => {
   return (
     <div className="flex gap-2 items-center">
       <button
-        className="diff-separator-button px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm"
+        className="inner-button text-sm"
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -20,7 +20,7 @@ const DiffButtons: React.FC<DiffButtonsProps> = ({ onAccept, onCancel }) => {
         Accept Changes
       </button>
       <button
-        className="diff-separator-button px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm"
+        className="outer-button bg-danger hover:bg-red-600 text-white text-sm"
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();

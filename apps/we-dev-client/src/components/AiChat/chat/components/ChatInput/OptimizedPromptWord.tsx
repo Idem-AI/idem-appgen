@@ -67,7 +67,7 @@ const PromptEnhanced = (props: PromptEnhancedProps) => {
             {t('chat.optimizePrompt.title')}
           </h3>
           <textarea
-            className="w-full h-32 p-2.5 text-xs border rounded-lg bg-white/50 dark:bg-gray-700/50 dark:border-gray-600/50 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none transition-all duration-200"
+            className="input h-32 text-xs resize-none"
             value={promptText}
             onChange={(e) => setPromptText(e.target.value)}
             placeholder={t('chat.optimizePrompt.placeholder')}
@@ -87,7 +87,7 @@ const PromptEnhanced = (props: PromptEnhancedProps) => {
               {t('chat.optimizePrompt.cancel')}
             </button>
             <button
-              className={`px-3 py-1.5 text-xs text-white bg-blue-500/90 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-all duration-200 ${
+              className={`inner-button text-xs ${
                 isLoading ? "opacity-70 cursor-not-allowed" : ""
               }`}
               onClick={handleClick}

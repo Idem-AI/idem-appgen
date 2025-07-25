@@ -86,7 +86,7 @@ export const UrlInputDialog: React.FC<UrlInputDialogProps> = ({
                 setError('');
               }}
               onKeyDown={handleKeyDown}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
+              className="input"
               placeholder={t('chat.urlInput.placeholder')}
               autoFocus
             />
@@ -102,14 +102,14 @@ export const UrlInputDialog: React.FC<UrlInputDialogProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="outer-button inline-flex justify-center text-sm font-medium"
             >
               {t('common.cancel')}
             </button>
             <button
               type="button"
               onClick={handleSubmit}
-              className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="inner-button inline-flex justify-center text-sm font-medium"
             >
               {t('common.confirm')}
             </button>

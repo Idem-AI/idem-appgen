@@ -25,30 +25,34 @@ const config = {
     },
     extend: {
       colors: {
+        // Original shadcn colors
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "#1447e6",
+          foreground: "#f5f5f5",
+          glow: "#1449e6a8",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "#d11ec0",
+          foreground: "#f5f5f5",
+          glow: "#d11ec0a8",
         },
         destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+          DEFAULT: "#d34053",
+          foreground: "#f5f5f5",
         },
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: "#22d3ee",
+          foreground: "#f5f5f5",
+          glow: "rgba(34, 211, 238, 0.6)",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -65,6 +69,13 @@ const config = {
           4: "hsl(var(--chart-4))",
           5: "hsl(var(--chart-5))",
         },
+        // Modern design system colors
+        'bg-dark': '#06080d',
+        'bg-light': '#0f141b',
+        'light-text': '#f5f5f5',
+        success: '#219653',
+        danger: '#d34053',
+        warning: '#ffa70b',
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -72,7 +83,26 @@ const config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["var(--font-sans)", ...fontFamily.sans],
+        sans: ["Jura", "var(--font-sans)", ...fontFamily.sans],
+        jura: ["Jura", "sans-serif"],
+        montserrat: ["Montserrat", "sans-serif"],
+        raleway: ["Raleway", "sans-serif"],
+      },
+      fontSize: {
+        'title': '5.4rem',
+        'title-mobile': '1.4rem',
+        'subtitle': '1.7rem',
+        'light-text': '1rem',
+      },
+      backdropBlur: {
+        'glass': '12px',
+      },
+      boxShadow: {
+        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+        'glass-hover': '0 12px 40px 0 rgba(0, 0, 0, 0.45)',
+        'glow-primary': '0 0 15px #1449e6a8',
+        'glow-secondary': '0 0 15px #d11ec0a8',
+        'glow-accent': '0 0 15px rgba(34, 211, 238, 0.6)',
       },
       keyframes: {
         "fade-in-down": {
@@ -119,6 +149,27 @@ const config = {
             "background-position": "calc(100% + var(--shiny-width)) 0",
           },
         },
+        "gradient-shift": {
+          "0%": {
+            "background-position": "0% 50%",
+          },
+          "50%": {
+            "background-position": "100% 50%",
+          },
+          "100%": {
+            "background-position": "0% 50%",
+          },
+        },
+        "reveal": {
+          "0%": {
+            "opacity": "0",
+            "transform": "translateY(30px)",
+          },
+          "100%": {
+            "opacity": "1",
+            "transform": "translateY(0)",
+          },
+        },
         animation: {
           "fade-in-down": "fade-in-down 0.5s ease-out",
           "accordion-down": "accordion-down 0.2s ease-out",
@@ -145,6 +196,8 @@ const config = {
         gradient: "gradient 8s linear infinite",
         "border-gradient": "border-gradient 3s ease infinite",
         ripple: "ripple 1s cubic-bezier(0, 0, 0.2, 1)",
+        "gradient-shift": "gradient-shift 3s ease infinite",
+        "reveal": "reveal 1s ease",
       },
     },
   },

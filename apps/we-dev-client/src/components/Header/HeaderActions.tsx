@@ -152,7 +152,7 @@ export function HeaderActions() {
         <div className="flex items-center gap-2">
           <button
             onClick={handleDownload}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors"
+            className="outer-button flex items-center gap-1.5 text-sm"
           >
             <svg
               className="w-4 h-4"
@@ -173,10 +173,10 @@ export function HeaderActions() {
             <button
               onClick={publish}
               disabled={isDeploying}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-white rounded-lg transition-colors ${
+              className={`flex items-center gap-1.5 text-sm ${
                 isDeploying 
-                  ? 'bg-purple-400 dark:bg-purple-500 opacity-75 cursor-not-allowed' 
-                  : 'bg-purple-600 dark:bg-purple-500 hover:bg-purple-700 dark:hover:bg-purple-600'
+                  ? 'outer-button opacity-75 cursor-not-allowed' 
+                  : 'inner-button'
               }`}
             >
               {isDeploying ? (

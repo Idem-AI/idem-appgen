@@ -29,27 +29,14 @@ export function ActionButton({
   const Icon = icons[icon];
 
   const variantClasses = {
-    default: cn(
-      "bg-white dark:bg-[#333333]",
-      "text-[#424242] dark:text-gray-300",
-      "hover:bg-[#f5f5f5] dark:hover:bg-[#404040]",
-      "hover:text-[#000000] dark:hover:text-white",
-      "border border-[#e5e5e5] dark:border-[#252525]"
-    ),
-    primary: cn(
-      "bg-[#0078d4] dark:bg-[#0078d4]",
-      "text-white dark:text-white",
-      "hover:bg-[#106ebe] dark:hover:bg-[#106ebe]",
-      "border-transparent"
-    ),
+    default: "outer-button",
+    primary: "inner-button",
   };
 
   return (
     <button
       className={cn(
-        "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium",
-        "transition-all duration-200 ease-in-out",
-        "shadow-sm hover:shadow",
+        "flex items-center gap-2 text-sm font-medium",
         variantClasses[variant],
         className
       )}

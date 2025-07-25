@@ -21,12 +21,12 @@ export const SendButton: React.FC<SendButtonProps> = ({
       }}
       // disabled={(!hasInput && !hasUploadingImages) || isUploading}
       className={classNames(
-        "p-2 rounded-lg transition-all duration-200 flex items-center gap-2",
+        "p-2 flex items-center gap-2",
         isLoading 
-          ? "bg-red-500 hover:bg-red-600 text-white"
+          ? "bg-danger hover:bg-red-600 text-white rounded-lg transition-all duration-200"
           : hasInput && !isUploading && !hasUploadingImages
-            ? "bg-purple-500 dark:bg-purple-600 hover:bg-purple-600 dark:hover:bg-purple-700 text-white"
-            : "bg-gray-100 dark:bg-gray-500/20 text-gray-400 dark:text-gray-500 cursor-not-allowed",
+            ? "inner-button"
+            : "outer-button opacity-50",
         isUploading && "opacity-50 cursor-not-allowed"
       )}
     >
