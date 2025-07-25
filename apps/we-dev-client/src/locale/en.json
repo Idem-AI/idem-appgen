@@ -128,7 +128,7 @@
       "command": "Command",
       "commandRequired": "Please enter a command",
       "config_description": "Configure Model Context Protocol servers",
-      "please_use_electron": "Please open https://we0.ai to download the client version",
+      "please_use_electron": "Please open https://idem appgen.ai to download the client version",
       "confirmDelete": "Delete Server",
       "confirmDeleteMessage": "Are you sure you want to delete the server?",
       "deleteError": "Failed to delete server",
@@ -304,7 +304,7 @@
     "register_success": "Registration Successful!",
     "register_success_account": "We have sent a verification email to your mailbox, please verify it in time.",
     "process_login": "Proceed to Login",
-    "create_account": "Create your We0 account",
+    "create_account": "Create your Idem Appgen account",
     "creating_account": "Creating Account...",
     "create_account_button": "Create Account",
     "already_account": "Already have an account?"

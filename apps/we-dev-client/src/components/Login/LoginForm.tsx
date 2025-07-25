@@ -1,5 +1,5 @@
-import { useState, useEffect, Dispatch, SetStateAction } from "react"
-import { motion } from "framer-motion"
+import { useState, useEffect, Dispatch, SetStateAction } from "react";
+import { motion } from "framer-motion";
 import {
   FaWeixin,
   FaEnvelope,
@@ -7,50 +7,49 @@ import {
   FaGithub,
   FaCode,
   FaSpinner,
-} from "react-icons/fa6"
-import { authService } from "../../api/auth"
-import { toast } from "react-hot-toast"
-import useUserStore from "../../stores/userSlice"
-import { useTranslation } from "react-i18next"
-import { TabType } from "."
-
+} from "react-icons/fa6";
+import { authService } from "../../api/auth";
+import { toast } from "react-hot-toast";
+import useUserStore from "../../stores/userSlice";
+import { useTranslation } from "react-i18next";
+import { TabType } from ".";
 
 type LoginFormProps = {
-  onSuccess?: () => void
-  onTabChange: Dispatch<SetStateAction<TabType>>
-}
+  onSuccess?: () => void;
+  onTabChange: Dispatch<SetStateAction<TabType>>;
+};
 
 const LoginForm = ({ onSuccess, onTabChange }: LoginFormProps) => {
   const [loginMethod, setLoginMethod] = useState<"email" | "github" | "wechat">(
     "email"
-  )
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [oauthLoading, setOauthLoading] = useState(false)
-  const [error, setError] = useState("")
-  const { setUser, setToken, setRememberMe, fetchUser } = useUserStore()
-  const [rememberMe, setRememberMeState] = useState(true)
-  const { t } = useTranslation()
+  );
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState(false);
+  const [error, setError] = useState("");
+  const { setUser, setToken, setRememberMe, fetchUser } = useUserStore();
+  const [rememberMe, setRememberMeState] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const handleLoginCallback = async (data: { token: string | undefined }) => {
-      const token = typeof data === "object" ? data.token : data
+      const token = typeof data === "object" ? data.token : data;
 
       if (token) {
-        setToken(token)
-        const user = await authService.getUserInfo(token)
-        setUser(user)
-        toast.success("success login")
-        onSuccess?.()
+        setToken(token);
+        const user = await authService.getUserInfo(token);
+        setUser(user);
+        toast.success("success login");
+        onSuccess?.();
       } else {
       }
-    }
+    };
 
     if (window.electron?.ipcRenderer) {
-      window.electron.ipcRenderer.on("login:callback", handleLoginCallback)
+      window.electron.ipcRenderer.on("login:callback", handleLoginCallback);
     } else {
-      console.warn("electron.ipcRenderer unavailable")
+      console.warn("electron.ipcRenderer unavailable");
     }
 
     return () => {
@@ -58,16 +57,15 @@ const LoginForm = ({ onSuccess, onTabChange }: LoginFormProps) => {
         window.electron.ipcRenderer.removeListener(
           "login:callback",
           handleLoginCallback
-        )
+        );
       }
     };
   }, [setToken, onSuccess]);
 
-
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setLoading(true)
+    e.preventDefault();
+    setError("");
+    setLoading(true);
     try {
       const response = await fetch(
         `${process.env.APP_BASE_URL}/api/auth/login`,
@@ -76,43 +74,46 @@ const LoginForm = ({ onSuccess, onTabChange }: LoginFormProps) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ email, password, language: localStorage.getItem('language')  }),
+          body: JSON.stringify({
+            email,
+            password,
+            language: localStorage.getItem("language"),
+          }),
         }
-      )
+      );
 
-      const data = await response.json()
-       if(data.code !== 200){
-        throw new Error(data.message || "Login failed")
+      const data = await response.json();
+      if (data.code !== 200) {
+        throw new Error(data.message || "Login failed");
       }
-      if(data.status && data.status !== 200){
-        throw new Error(data.message || "Login failed")
+      if (data.status && data.status !== 200) {
+        throw new Error(data.message || "Login failed");
       }
 
-      setToken(data.token)
+      setToken(data.token);
 
       // TODO 这里最好加一个loading
       // 拿到了 token 之后，再去fetchUser
-      const user = await fetchUser()
+      const user = await fetchUser();
 
       if (!response.ok) {
-        throw new Error(data.error || "Login failed")
+        throw new Error(data.error || "Login failed");
       }
 
       // Set remember me state
-      setRememberMe(rememberMe)
+      setRememberMe(rememberMe);
 
       // After successful login, use login action to set user info and token at once
-      setUser(user)
+      setUser(user);
 
-      toast.success("Login successful!")
-      onSuccess?.()
+      toast.success("Login successful!");
+      onSuccess?.();
     } catch (err) {
-      
-      setError(t(`login.${err.message}`) || "Login failed")
+      setError(t(`login.${err.message}`) || "Login failed");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -122,12 +123,13 @@ const LoginForm = ({ onSuccess, onTabChange }: LoginFormProps) => {
             <FaCode className="text-2xl text-white" />
           </div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
-          We0
+            Idem Appgen
           </h1>
         </div>
-        <p className="text-[#666]">{t("login.AI_powered_development_platform")}</p>
+        <p className="text-[#666]">
+          {t("login.AI_powered_development_platform")}
+        </p>
       </div>
-
 
       {loginMethod === "email" && (
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -206,7 +208,7 @@ const LoginForm = ({ onSuccess, onTabChange }: LoginFormProps) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default LoginForm
+export default LoginForm;

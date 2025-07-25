@@ -1,29 +1,29 @@
-[![English](https://img.shields.io/badge/README-English-494cad.svg)](https://github.com/we0-dev/we0/blob/main/README.md) [![中文](https://img.shields.io/badge/README-中文-494cad.svg)](https://github.com/we0-dev/we0/blob/main/docs/README.zh.md) 
+[![English](https://img.shields.io/badge/README-English-494cad.svg)](https://github.com/idem appgen-dev/idem appgen/blob/main/README.md) [![中文](https://img.shields.io/badge/README-中文-494cad.svg)](https://github.com/idem appgen-dev/idem appgen/blob/main/docs/README.zh.md) 
 
-# we0
+# idem appgen
 
-## What is We0
+## What is Idem Appgen
 
 ![alt text](./docs/img/image-1.png)
 
 ## Video
-[![youtube](https://we0.ai/en/opengraph-image.png?dda1b12e6eb7c5e1)](https://www.youtube.com/watch?v=-dyf0Zb8h20)
+[![youtube](https://idem appgen.ai/en/opengraph-image.png?dda1b12e6eb7c5e1)](https://www.youtube.com/watch?v=-dyf0Zb8h20)
 
-## What Makes We0 Different?
+## What Makes Idem Appgen Different?
 
-Currently, Cursor, v0, and Bolt.new have impressive performance in web project generation. The We0 project has the following features:
+Currently, Cursor, v0, and Bolt.new have impressive performance in web project generation. The Idem Appgen project has the following features:
 
 Supports browser-based debugging: Built-in WebContainer environment allows you to run a terminal in the browser, install and run npm and tool libraries.
 
 High-fidelity design restoration: Utilizes cutting-edge D2C technology to achieve 90% design restoration.
 
-Supports importing historical projects: Unlike Bolt.new, which runs in a browser environment, We0 can directly open existing historical projects for secondary editing and debugging.
+Supports importing historical projects: Unlike Bolt.new, which runs in a browser environment, Idem Appgen can directly open existing historical projects for secondary editing and debugging.
 
 Integrates with WeChat Mini Program Developer Tools: Allows direct preview and debugging by clicking to launch the WeChat Developer Tools.
 
 Multi-platform support: Supports Windows and Mac operating systems for client downloads, as well as web container scenarios, allowing you to choose the appropriate terminal based on usage scenarios.
 
-| Feature                                    | we0 | v0  | bolt.new |
+| Feature                                    | idem appgen | v0  | bolt.new |
 | ------------------------------------------ | --- | --- | -------- |
 | Code generation and preview                | ✅  | ✅  | ✅       |
 | Design-to-code conversion(no open)         | ✅  | ✅  | ✅       |
@@ -101,10 +101,10 @@ Supports quick start from the root directory.
 
 
 ## How to Install and Use
-  1. Go to https://we0.ai/.
+  1. Go to https://idem appgen.ai/.
   2. Select Download for Mac or Windows to download the installer.
   3. Run the installer.
-  4. Open the We0 application.
+  4. Open the Idem Appgen application.
 ## Question
 - If electron reports an error during the second run, please delete the client workspace
 - electron If there is no preview when starting, run pnpm run electron:dev
@@ -122,10 +122,10 @@ If you cannot join the WeChat group, you can add
 
 ## Star History
 
-<a href="https://star-history.com/?utm_source=bestxtools.com#we0-dev/we0&Date">
+<a href="https://star-history.com/?utm_source=bestxtools.com#idem appgen-dev/idem appgen&Date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=we0-dev/we0&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=we0-dev/we0&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=we0-dev/we0&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=idem appgen-dev/idem appgen&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=idem appgen-dev/idem appgen&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=idem appgen-dev/idem appgen&type=Date" />
  </picture>
 </a>

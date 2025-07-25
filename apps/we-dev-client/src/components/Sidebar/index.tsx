@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from "react"
-import { createPortal } from "react-dom"
-import { Settings, SettingsTab, TAB_KEYS } from "../Settings"
-import { db } from "../../utils/indexDB"
-import { eventEmitter } from "../AiChat/utils/EventEmitter"
-import useUserStore from "../../stores/userSlice"
-import { useTranslation } from "react-i18next"
+import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
+import { Settings, SettingsTab, TAB_KEYS } from "../Settings";
+import { db } from "../../utils/indexDB";
+import { eventEmitter } from "../AiChat/utils/EventEmitter";
+import useUserStore from "../../stores/userSlice";
+import { useTranslation } from "react-i18next";
 
 interface SidebarProps {
-  isOpen: boolean
-  onClose: () => void
-  username: string
-  onMouseEnter: () => void
-  onMouseLeave: () => void
-  onChatSelect?: (uuid: string) => void
+  isOpen: boolean;
+  onClose: () => void;
+  username: string;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
+  onChatSelect?: (uuid: string) => void;
 }
 
 export function Sidebar({
@@ -22,33 +22,33 @@ export function Sidebar({
   onMouseLeave,
   onChatSelect,
 }: SidebarProps) {
-  const { t } = useTranslation()
-  const { user, isAuthenticated, logout, openLoginModal } = useUserStore()
+  const { t } = useTranslation();
+  const { user, isAuthenticated, logout, openLoginModal } = useUserStore();
 
   const [settingsState, setSettingsState] = useState<{
-    isOpen: boolean
-    tab: SettingsTab
+    isOpen: boolean;
+    tab: SettingsTab;
   }>({
     isOpen: false,
     tab: TAB_KEYS.GENERAL,
-  })
+  });
   const [chatHistory, setChatHistory] = useState<
     {
-      uuid: string
-      title?: string
-      lastMessage: string
-      time: number
+      uuid: string;
+      title?: string;
+      lastMessage: string;
+      time: number;
     }[]
-  >([])
-  const [searchTerm, setSearchTerm] = useState("")
+  >([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Load chat history
   const loadChatHistory = async () => {
     try {
-      const uuids = await db.getAllUuids()
+      const uuids = await db.getAllUuids();
       const historyPromises = uuids.map(async (uuid) => {
-        const records = await db.getByUuid(uuid)
-        const latestRecord = records[0] // Already sorted by time, get latest
+        const records = await db.getByUuid(uuid);
+        const latestRecord = records[0]; // Already sorted by time, get latest
 
         // Add safety check
         if (!latestRecord?.data?.messages?.length) {
@@ -57,69 +57,69 @@ export function Sidebar({
             title: "New Chat",
             lastMessage: "",
             time: latestRecord?.time || Date.now(),
-          }
+          };
         }
 
         const lastMessage =
-          latestRecord.data.messages[latestRecord.data.messages.length - 1]
+          latestRecord.data.messages[latestRecord.data.messages.length - 1];
 
         return {
           uuid,
           title: latestRecord.data.title || "New Chat",
           lastMessage: lastMessage?.content || "",
           time: latestRecord.time,
-        }
-      })
+        };
+      });
 
-      const history = await Promise.all(historyPromises)
+      const history = await Promise.all(historyPromises);
       // Sort by time
-      const sortedHistory = history.sort((a, b) => b.time - a.time)
-      setChatHistory(sortedHistory)
+      const sortedHistory = history.sort((a, b) => b.time - a.time);
+      setChatHistory(sortedHistory);
     } catch (error) {
-      console.error("Failed to load chat history:", error)
-      setChatHistory([]) // Set empty array when error occurs
+      console.error("Failed to load chat history:", error);
+      setChatHistory([]); // Set empty array when error occurs
     }
-  }
+  };
 
   useEffect(() => {
-    loadChatHistory()
+    loadChatHistory();
 
     // Subscribe to database updates
     db.subscribe(() => {
-      loadChatHistory()
-    })
+      loadChatHistory();
+    });
 
     // Cleanup subscription
     // return () => unsubscribe();
-  }, [])
+  }, []);
 
   // Filter chat history
   const filteredHistory = chatHistory.filter(
     (chat) =>
       chat.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       chat.lastMessage.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  );
 
   // Delete chat history
   const deleteChat = async (uuid: string, e: React.MouseEvent) => {
-    e.stopPropagation()
-    await db.deleteByUuid(uuid)
-    await loadChatHistory()
-  }
+    e.stopPropagation();
+    await db.deleteByUuid(uuid);
+    await loadChatHistory();
+  };
 
   const openSettings = (tab: SettingsTab) => {
     setSettingsState({
       isOpen: true,
       tab,
-    })
-  }
+    });
+  };
 
   const closeSettings = () => {
     setSettingsState((prev) => ({
       ...prev,
       isOpen: false,
-    }))
-  }
+    }));
+  };
 
   const getInitials = (name: string) => {
     return (
@@ -129,30 +129,30 @@ export function Sidebar({
         .join("")
         .toUpperCase()
         .slice(0, 2) || "?"
-    )
-  }
+    );
+  };
 
   const handleLogout = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    logout()
-    onClose()
-  }
+    e.stopPropagation();
+    logout();
+    onClose();
+  };
 
   const openUserCenter = () => {
-    const url = "https://we0.ai/user"
+    const url = "https://idem appgen.ai/user";
     if (window.electron?.ipcRenderer) {
-      window.electron.ipcRenderer.send("open:external:url", url)
+      window.electron.ipcRenderer.send("open:external:url", url);
     } else {
-      window.open(url, "_blank", "noopener,noreferrer")
+      window.open(url, "_blank", "noopener,noreferrer");
     }
-  }
+  };
   const renderUserSection = () => {
     if (!isAuthenticated) {
       return (
         <div
           className="p-3 cursor-pointer hover:bg-white/5"
           onClick={() => {
-            openLoginModal()
+            openLoginModal();
           }}
         >
           <div className="flex items-center gap-2">
@@ -169,7 +169,7 @@ export function Sidebar({
             </div>
           </div>
         </div>
-      )
+      );
     }
 
     return (
@@ -224,8 +224,8 @@ export function Sidebar({
           </button>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   return createPortal(
     <>
@@ -246,7 +246,7 @@ export function Sidebar({
         {/* Logo */}
         <div className="p-3">
           <h1 className="text-gray-900 dark:text-white text-[14px] font-medium">
-            We0
+            Idem Appgen
           </h1>
         </div>
 
@@ -295,8 +295,8 @@ export function Sidebar({
               </span>
               <button
                 onClick={(e) => {
-                  e.stopPropagation()
-                  deleteChat(chat.uuid, e)
+                  e.stopPropagation();
+                  deleteChat(chat.uuid, e);
                 }}
                 className="hidden text-gray-500 group-hover:block dark:text-gray-400 hover:text-gray-700 dark:hover:text-white"
               >
@@ -350,7 +350,7 @@ export function Sidebar({
 
             <button
               onClick={() => {
-                openUserCenter()
+                openUserCenter();
               }}
               className="flex items-center w-full gap-2 px-3 py-2 text-left text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/5"
             >
@@ -385,5 +385,5 @@ export function Sidebar({
       />
     </>,
     document.body
-  )
+  );
 }

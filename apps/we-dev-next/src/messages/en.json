@@ -8,7 +8,7 @@
     "login": "Login"
   },
   "hero": {
-    "language":"en",
+    "language": "en",
     "title": "Generate any code at once and design",
     "slogan": "Create AI-powered applications including Vue, React, Next.js, Python, Java, and WeChat Mini Programs.",
     "download": {
@@ -19,7 +19,7 @@
   },
   "inputSection": {
     "title": "Start with a simple prompt",
-    "placeholder": "Start using we0 to create a program",
+    "placeholder": "Start using idem appgen to create a program",
     "button": "Generate",
     "importImage": "Import Image",
     "sketchFile": "Sketch or Figma File",
@@ -37,7 +37,7 @@
   },
   "projectsSection": {
     "title": "Showcase Projects",
-    "subtitle": "See what others have built with We0",
+    "subtitle": "See what others have built with Idem Appgen",
     "viewMore": "View More",
     "saas": {
       "description": "Backend Visualization Page"
@@ -249,7 +249,7 @@
     }
   },
   "featureCards": {
-    "title": "We0's Code generation capabilities",
+    "title": "Idem Appgen's Code generation capabilities",
     "screenshotToCode": {
       "title": "Screenshot to Code",
       "description": "Upload any design screenshot and get pixel-perfect code."
@@ -275,4 +275,4 @@
       "description": "All generated code is mobile-friendly and responsive."
     }
   }
-} 
+}

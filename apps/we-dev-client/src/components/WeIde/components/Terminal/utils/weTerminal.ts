@@ -1,11 +1,11 @@
-import { Terminal as XTerm } from '@xterm/xterm';
-import { FitAddon } from '@xterm/addon-fit';
-import { WebLinksAddon } from '@xterm/addon-web-links';
-import { IPty } from 'node-pty';
-import { updateFileSystemNow } from '../../../services';
-import { getWebContainerInstance } from '../../../services/webcontainer';
-import { getNodeContainerInstance } from '../../../services/nodecontainer';
-import { eventEmitter } from '@/components/AiChat/utils/EventEmitter';
+import { Terminal as XTerm } from "@xterm/xterm";
+import { FitAddon } from "@xterm/addon-fit";
+import { WebLinksAddon } from "@xterm/addon-web-links";
+import { IPty } from "node-pty";
+import { updateFileSystemNow } from "../../../services";
+import { getWebContainerInstance } from "../../../services/webcontainer";
+import { getNodeContainerInstance } from "../../../services/nodecontainer";
+import { eventEmitter } from "@/components/AiChat/utils/EventEmitter";
 
 interface CommandResult {
   output: string[];
@@ -13,30 +13,30 @@ interface CommandResult {
 }
 // Light theme in VSCode style
 const lightTheme = {
-  foreground: '#000000',
-  cursor: '#000000',
-  background: '#fefefe',
+  foreground: "#000000",
+  cursor: "#000000",
+  background: "#fefefe",
 };
 
 // Dark theme in VSCode style
 const darkTheme = {
-  background: '#18181a',
-  foreground: '#ffffff',
+  background: "#18181a",
+  foreground: "#ffffff",
 };
 
 /**
  * @description
- * 
+ *
  * This is just a class. For unified terminal management,
- * 
+ *
  * please refer to: apps\we-dev-client\src\stores\terminalSlice.ts
- * 
+ *
  * ---
- * 
+ *
  * @example
  * const terminal = new Terminal();
  * terminal.initialize(React.createRef<HTMLDivElement>().current)
- * 
+ *
  */
 class Terminal {
   private terminal: XTerm | null = null;
@@ -47,19 +47,26 @@ class Terminal {
   private initId: string | null = null;
   private processId: string | null = null;
   private initialized: boolean = false; // Add initialization flag
-  private containerRef: React.RefObject<HTMLDivElement> | null = null
+  private containerRef: React.RefObject<HTMLDivElement> | null = null;
 
-  constructor(private container: HTMLElement | null, isDarkMode: boolean = true) {
+  constructor(
+    private container: HTMLElement | null,
+    isDarkMode: boolean = true
+  ) {
     this.isDarkMode = isDarkMode;
   }
 
   // Initialize terminal
-  public async initialize(container: HTMLElement, processId: string, addError?: (error: any) => void) {
+  public async initialize(
+    container: HTMLElement,
+    processId: string,
+    addError?: (error: any) => void
+  ) {
     if (this.initialized || !container) return; // Avoid repeated initialization
 
     this.initialized = true; // Mark as initialized
 
-    this.processId = processId
+    this.processId = processId;
     this.container = container;
     const term = new XTerm({
       cursorBlink: true,
@@ -67,7 +74,7 @@ class Terminal {
       theme: this.isDarkMode ? darkTheme : lightTheme,
       fontSize: 12,
       fontFamily: 'Menlo, Monaco, "Courier New", monospace',
-      fontWeight: '500',
+      fontWeight: "500",
       letterSpacing: 0,
       lineHeight: 1.4,
     });
@@ -84,58 +91,57 @@ class Terminal {
     term.open(container);
     fitAddon.fit();
 
-    term.onSelectionChange(() => {  
+    term.onSelectionChange(() => {
       // When text is selected, it can be copied using Ctrl+C
-      if (term.hasSelection()) {  
-        const selection = term.getSelection()  
-        console.log('Selected text:', selection)  
-      }  
-    })  
+      if (term.hasSelection()) {
+        const selection = term.getSelection();
+        console.log("Selected text:", selection);
+      }
+    });
 
     // Listen for keyboard events
-    term.attachCustomKeyEventHandler((event) => {  
+    term.attachCustomKeyEventHandler((event) => {
       // Check if it's a copy operation (Ctrl for Windows/Linux, Command for Mac)
-      const isCopyAction = (event.ctrlKey || event.metaKey) && event.key === 'c';
-      if (isCopyAction && term.hasSelection()) {  
+      const isCopyAction =
+        (event.ctrlKey || event.metaKey) && event.key === "c";
+      if (isCopyAction && term.hasSelection()) {
         const selection = term.getSelection();
         navigator.clipboard.writeText(selection);
         event.preventDefault();
         event.stopPropagation();
         return false; // Prevent default behavior
-      }  
-      
+      }
+
       // Check if it's a paste operation (Ctrl for Windows/Linux, Command for Mac)
-      const isPasteAction = (event.ctrlKey || event.metaKey) && event.key === 'v';
-      if (isPasteAction) {  
-        navigator.clipboard.readText().then(text => {  
+      const isPasteAction =
+        (event.ctrlKey || event.metaKey) && event.key === "v";
+      if (isPasteAction) {
+        navigator.clipboard.readText().then((text) => {
           term.paste(text);
         });
         return false; // Prevent default behavior
-      }  
-      
-      return true; // Allow other keyboard events
-    });  
+      }
 
-    term.writeln('\x1b[1;32mWelcome to Terminal\x1b[0m');
-    term.writeln('Type \x1b[1;34mhelp\x1b[0m for a list of commands\n');
-    term.write('$ ');
+      return true; // Allow other keyboard events
+    });
+
+    term.writeln("\x1b[1;32mWelcome to Terminal\x1b[0m");
+    term.writeln("Type \x1b[1;34mhelp\x1b[0m for a list of commands\n");
+    term.write("$ ");
 
     await this.waitCommand(addError);
 
     this.isReady = true;
 
-
     // Bind resize event
     this.handleResize = this.handleResize.bind(this);
-    window.addEventListener('resize', this.handleResize);
+    window.addEventListener("resize", this.handleResize);
 
     // Listen for container size changes
     this.resizeObserver = new ResizeObserver(() => {
       this.handleResize();
     });
     this.resizeObserver.observe(container);
-
-
   }
 
   // Check if initialized
@@ -164,7 +170,6 @@ class Terminal {
     this.containerRef = ref;
   }
 
-
   // Handle window size changes
   private handleResize() {
     if (this.fitAddon) {
@@ -173,7 +178,7 @@ class Terminal {
       if (this.terminal && window?.electron?.ipcRenderer) {
         // @ts-ignore
         const { cols, rows } = this.terminal.options;
-        window.electron.ipcRenderer.invoke('terminal:resize', cols, rows);
+        window.electron.ipcRenderer.invoke("terminal:resize", cols, rows);
       }
     }
   }
@@ -189,7 +194,6 @@ class Terminal {
   // Wait for command input
   private async waitCommand(addError?: (error: any) => void) {
     if (window.electron) {
-      
       await this.nodeWaitCommand(addError);
     } else {
       await this.webWaitCommand(addError);
@@ -199,39 +203,38 @@ class Terminal {
   // Command wait in Web environment
   private async webWaitCommand(addError?: (error: any) => void) {
     const instance = await getWebContainerInstance();
-    const process = await instance?.spawn('/bin/jsh', [], {
+    const process = await instance?.spawn("/bin/jsh", [], {
       terminal: {
         cols: 80,
         rows: 15,
       },
     });
 
-
-    eventEmitter.emit('terminal:update', this.processId);
+    eventEmitter.emit("terminal:update", this.processId);
 
     const input = process?.input.getWriter();
     const output = process?.output;
 
-
     output?.pipeTo(
       new WritableStream({
         write: (data) => {
-          if ((data.includes('error') || data.includes('failure')) && addError) {
+          if (
+            (data.includes("error") || data.includes("failure")) &&
+            addError
+          ) {
             addError({
-              message: 'compile error',
+              message: "compile error",
               code: this.stripAnsi(data),
-              severity: 'error',
+              severity: "error",
             });
           }
           if (!this.initId) {
-            this.initId = data?.split('/')[1].split('[39m')[0].trim()
+            this.initId = data?.split("/")[1].split("[39m")[0].trim();
           }
-          this.terminal.write(data.replaceAll(this.initId, 'We0'))
-  
+          this.terminal.write(data.replaceAll(this.initId, "Idem Appgen"));
         },
-      }),
+      })
     );
-
 
     this.terminal?.onData((data) => {
       input?.write(data);
@@ -243,23 +246,22 @@ class Terminal {
     const instance = await getNodeContainerInstance();
     const electron = window.electron;
 
-    const { processId } = await electron.ipcRenderer.invoke('terminal:create', {
+    const { processId } = await electron.ipcRenderer.invoke("terminal:create", {
       cols: this.terminal?.cols,
       rows: this.terminal?.rows,
-      processId: this.processId
+      processId: this.processId,
     });
-    
 
-    eventEmitter.emit('terminal:update', processId);
-    
+    eventEmitter.emit("terminal:update", processId);
+
     electron.ipcRenderer.on(`terminal-output-${processId}`, (data: string) => {
       updateFileSystemNow();
       this.terminal?.write(data);
-      if ((data.includes('error') || data.includes('failure')) && addError) {
+      if ((data.includes("error") || data.includes("failure")) && addError) {
         addError({
-          message: 'compile error',
+          message: "compile error",
           code: this.stripAnsi(data),
-          severity: 'error',
+          severity: "error",
         });
       }
       const cleanData = this.stripAnsi(data);
@@ -270,16 +272,21 @@ class Terminal {
       if (urlMatch) {
         const port = urlMatch[1] || urlMatch[2] || urlMatch[3];
         const url = `http://localhost:${port}`;
-        instance?.emit('server-ready', parseInt(port), url);
+        instance?.emit("server-ready", parseInt(port), url);
       }
     });
 
     this.terminal?.onData((data) => {
-      electron.ipcRenderer.invoke('terminal:write', this.processId, data);
+      electron.ipcRenderer.invoke("terminal:write", this.processId, data);
     });
 
     this.terminal?.onResize(({ cols, rows }) => {
-      electron.ipcRenderer.invoke('terminal:resize', this.processId, cols, rows);
+      electron.ipcRenderer.invoke(
+        "terminal:resize",
+        this.processId,
+        cols,
+        rows
+      );
     });
   }
 
@@ -293,17 +300,22 @@ class Terminal {
   }
 
   // Execute command in Electron
-  private async executeCommandInElectron(command: string): Promise<CommandResult> {
+  private async executeCommandInElectron(
+    command: string
+  ): Promise<CommandResult> {
     const { invoke } = window.electron!.ipcRenderer;
     const output: string[] = [];
 
     if (this.processId) {
-      await invoke('terminal:write', this.processId, command + '\n');
+      await invoke("terminal:write", this.processId, command + "\n");
     }
 
-    window.electron!.ipcRenderer.on(`terminal-output-${this.processId}`, (data: string) => {
-      output.push(data);
-    });
+    window.electron!.ipcRenderer.on(
+      `terminal-output-${this.processId}`,
+      (data: string) => {
+        output.push(data);
+      }
+    );
 
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -316,16 +328,16 @@ class Terminal {
   // Execute command in Web
   private async executeCommandInWeb(command: string): Promise<CommandResult> {
     const instance = await getWebContainerInstance();
-    const process = await instance.spawn('jsh', ['-c', command], {
+    const process = await instance.spawn("jsh", ["-c", command], {
       env: { npm_config_yes: true },
     });
 
     process.output.pipeTo(
       new WritableStream({
-        write: (data) =>{
+        write: (data) => {
           this.terminal?.write(data);
         },
-      }),
+      })
     );
 
     const exitCode = await process.exit;
@@ -338,9 +350,9 @@ class Terminal {
 
   // Remove ANSI escape sequences and timestamps
   private stripAnsi(str: string): string {
-    str = str.replace(/\u001b\[\d+m/g, '');
+    str = str.replace(/\u001b\[\d+m/g, "");
     if (/^\d{2}:\d{2}:\d{2}\s/.test(str)) {
-      str = str.replace(/^\d{2}:\d{2}:\d{2}\s+/, '');
+      str = str.replace(/^\d{2}:\d{2}:\d{2}\s+/, "");
     }
     return str;
   }
@@ -352,29 +364,26 @@ class Terminal {
       this.resizeObserver = null;
     }
     if (this.terminal) {
-      console.log("Release terminal", this.processId)
+      console.log("Release terminal", this.processId);
       this.terminal.dispose(); // Release XTerm resources
       this.terminal = null;
     }
     if (this.fitAddon) {
-      console.log("Release fitAddon", this.processId)
+      console.log("Release fitAddon", this.processId);
       this.fitAddon.dispose(); // Release FitAddon resources
       this.fitAddon = null;
     }
-    
-    if(window.electron){
-      window.electron.ipcRenderer.invoke('terminal:dispose', this.processId);
+
+    if (window.electron) {
+      window.electron.ipcRenderer.invoke("terminal:dispose", this.processId);
     }
 
-
-    window.removeEventListener('resize', this.handleResize);
+    window.removeEventListener("resize", this.handleResize);
 
     if (this.fitAddon) {
       this.fitAddon = null;
     }
-
   }
 }
-
 
 export default Terminal;

@@ -45,7 +45,7 @@ async function downloadBunBinary(platform, arch, version = DEFAULT_BUN_VERSION, 
     }
 
     // Create output directory structure
-    const binDir = path.join(os.homedir(), '.we0', 'bin')
+    const binDir = path.join(os.homedir(), '.idem appgen', 'bin')
     // Ensure directories exist
     fs.mkdirSync(binDir, { recursive: true })
 

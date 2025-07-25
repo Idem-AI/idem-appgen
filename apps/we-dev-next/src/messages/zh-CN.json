@@ -8,7 +8,7 @@
     "login": "登录"
   },
   "hero": {
-    "language":"zh-CN",
+    "language": "zh-CN",
     "title": "一键生成任何代码或者设计稿",
     "slogan": "使用ai创建应用程序，包括 Vue、React、Next.js、Python、Java 和微信小程序。",
     "download": {
@@ -19,7 +19,7 @@
   },
   "inputSection": {
     "title": "从简单的提示开始",
-    "placeholder": "开始使用we0创建一个程序",
+    "placeholder": "开始使用idem appgen创建一个程序",
     "button": "生成",
     "importImage": "导入图片",
     "sketchFile": "Sketch 或者 Figma 文件",
@@ -37,7 +37,7 @@
   },
   "projectsSection": {
     "title": "项目展示",
-    "subtitle": "查看其他人使用 We0 构建的项目",
+    "subtitle": "查看其他人使用 Idem Appgen 构建的项目",
     "viewMore": "查看更多",
     "saas": {
       "description": "后台可视化页面"
@@ -249,7 +249,7 @@
     }
   },
   "featureCards": {
-    "title": "We0的代码生成能力",
+    "title": "Idem Appgen的代码生成能力",
     "screenshotToCode": {
       "title": "截图转代码",
       "description": "上传任任意网站截图，直接生成完美复刻的代码。"
@@ -275,4 +275,4 @@
       "description": "所有生成的代码都适合移动设备且响应迅速。"
     }
   }
-} 
+}

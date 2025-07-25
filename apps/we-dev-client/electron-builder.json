@@ -1,6 +1,6 @@
 {
-  "productName": "We0",
-  "appId": "com.wecode.we0",
+  "productName": "Idem Appgen",
+  "appId": "com.wecode.idem appgen",
   "afterSign": null,
   "directories": {
     "output": "release"
@@ -14,7 +14,9 @@
     "target": [
       {
         "target": "dmg",
-        "arch": ["arm64"]
+        "arch": [
+          "arm64"
+        ]
       }
     ],
     "category": "public.app-category.developer-tools",

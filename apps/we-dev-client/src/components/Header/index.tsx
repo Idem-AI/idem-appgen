@@ -12,7 +12,7 @@ function Header() {
         <FaCode className="text-[12px] text-white" />
       </div>
       <h1 className="ml-2 opacity-90 text-[18px] font-bold bg-gradient-to-r from-purple-500 to-purple-600 dark:from-blue-500 dark:to-purple-500 bg-clip-text text-transparent">
-        We0
+        Idem Appgen
       </h1>
       <div className="flex-1 flex justify-end">
         <HeaderActions />

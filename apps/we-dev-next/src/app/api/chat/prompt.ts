@@ -101,18 +101,18 @@ export interface promptExtra {
   extra: object;
 }
 export interface ParametersSchema {
-  type: string
-  title?: string
-  description?: string,
-  required?: string[]
-  properties: Record<string, object>
+  type: string;
+  title?: string;
+  description?: string;
+  required?: string[];
+  properties: Record<string, object>;
 }
 
 export interface ToolInfo {
-  id: `${string}.${string}`,
-  name: string,
-  description?: string,
-  parameters: ParametersSchema
+  id: `${string}.${string}`;
+  name: string;
+  description?: string;
+  parameters: ParametersSchema;
 }
 const getExtraPrompt = (
   type: typeEnum,
@@ -146,55 +146,62 @@ const getExtraPrompt = (
     const ret = resolveExtra(extra);
     promptArr.unshift(...ret);
   }
-  
-  let prompt = '';
-  for(let index = 0; index<promptArr.length;index++){
-    prompt+=`${index+startNum}. ${promptArr[index]}\n`
+
+  let prompt = "";
+  for (let index = 0; index < promptArr.length; index++) {
+    prompt += `${index + startNum}. ${promptArr[index]}\n`;
   }
-  console.log(prompt,'prompt')
+  console.log(prompt, "prompt");
   return prompt;
 };
 
 function resolveExtra(extra: promptExtra) {
   const promptArr = [];
-  if(extra.isBackEnd){
-    promptArr.push("IMPORTANT: You must generate backend code, do not only generate frontend code")
-    promptArr.push("IMPORTANT: Backend must handle CORS for all domains")
-      let language = (extra.backendLanguage || 'java').toLocaleLowerCase();
-      if(language == ''){
-        language = 'java';
-      }
-      const backPromptArr  = backendLanguageFunctionRegister[language](extra) //Strategy pattern backend execution
-      promptArr.push(...backPromptArr);
+  if (extra.isBackEnd) {
+    promptArr.push(
+      "IMPORTANT: You must generate backend code, do not only generate frontend code"
+    );
+    promptArr.push("IMPORTANT: Backend must handle CORS for all domains");
+    let language = (extra.backendLanguage || "java").toLocaleLowerCase();
+    if (language == "") {
+      language = "java";
+    }
+    const backPromptArr = backendLanguageFunctionRegister[language](extra); //Strategy pattern backend execution
+    promptArr.push(...backPromptArr);
 
-      if(extra.extra['isOpenDataBase']??false){
-          let database = (extra.extra['database']??"mysql").toLocaleLowerCase();
-          if(database == ''){
-            database = 'mysql';
-          }
-          const databasePromptArr = databaseeFunctionRegister[database](extra) //Strategy pattern database execution
-          promptArr.push(...databasePromptArr);
-      }else{
-        promptArr.push("IMPORTANT: Backend does not need database, use Map for storage")
+    if (extra.extra["isOpenDataBase"] ?? false) {
+      let database = (extra.extra["database"] ?? "mysql").toLocaleLowerCase();
+      if (database == "") {
+        database = "mysql";
       }
-      if(extra.extra['isOpenCache']??false){
-        let cache = extra.extra['cache']??"redis"
-        if(cache == ''){
-          cache = 'redis';
-        }
-        const cachePromptArr = cacheFunctionRegister[cache](extra) //Strategy pattern cache execution
-        promptArr.push(...cachePromptArr);
+      const databasePromptArr = databaseeFunctionRegister[database](extra); //Strategy pattern database execution
+      promptArr.push(...databasePromptArr);
+    } else {
+      promptArr.push(
+        "IMPORTANT: Backend does not need database, use Map for storage"
+      );
+    }
+    if (extra.extra["isOpenCache"] ?? false) {
+      let cache = extra.extra["cache"] ?? "redis";
+      if (cache == "") {
+        cache = "redis";
+      }
+      const cachePromptArr = cacheFunctionRegister[cache](extra); //Strategy pattern cache execution
+      promptArr.push(...cachePromptArr);
     }
 
-      promptArr.push(`IMPORTANT: Write the defined interfaces into a json file named api.json, json (URL with complete ip+port) format as {"id":"root","name":"APICollection","type":"folder","children":[{"id":"folder-1","type":"folder","name":""//folder name,"children":[{"id":"1","type":"api","name":"","method":"",//GET"url":"","headers":[{"key":"","value":""}],"query":[{"key":"","value":""}],"cookies":[{"key":"","value":""}]},{"id":"2","type":"api","name":"",//API name"method":"",//POSTorPUTorDELETE"url":"","headers":[{"key":"","value":""}],"query":[{"key":"","value":""}],"cookies":[{"key":"","value":""}],"bodyType":"",//jsonorformDataorurlencodedorrawornoneorbinary"body":{"none":"","formData":[],"urlencoded":[],"raw":"","json":{},"binary":null}}]}]}`)
-      promptArr.push("IMPORTANT: Use localhost for backend address, do not use remote ip addresses, especially not database ones, connect frontend to backend, abstract frontend-backend interface connections into an api.js, and separate frontend and backend files, put frontend files under src, package.json in current directory, backend files in backend directory.")
-
+    promptArr.push(
+      `IMPORTANT: Write the defined interfaces into a json file named api.json, json (URL with complete ip+port) format as {"id":"root","name":"APICollection","type":"folder","children":[{"id":"folder-1","type":"folder","name":""//folder name,"children":[{"id":"1","type":"api","name":"","method":"",//GET"url":"","headers":[{"key":"","value":""}],"query":[{"key":"","value":""}],"cookies":[{"key":"","value":""}]},{"id":"2","type":"api","name":"",//API name"method":"",//POSTorPUTorDELETE"url":"","headers":[{"key":"","value":""}],"query":[{"key":"","value":""}],"cookies":[{"key":"","value":""}],"bodyType":"",//jsonorformDataorurlencodedorrawornoneorbinary"body":{"none":"","formData":[],"urlencoded":[],"raw":"","json":{},"binary":null}}]}]}`
+    );
+    promptArr.push(
+      "IMPORTANT: Use localhost for backend address, do not use remote ip addresses, especially not database ones, connect frontend to backend, abstract frontend-backend interface connections into an api.js, and separate frontend and backend files, put frontend files under src, package.json in current directory, backend files in backend directory."
+    );
   }
   return promptArr;
 }
 
-export const getSystemPrompt = (type: typeEnum,otherConfig:promptExtra) => `
-You are We0 AI, an expert AI assistant and exceptional senior software developer with vast knowledge across multiple programming languages, frameworks, and best practices.
+export const getSystemPrompt = (type: typeEnum, otherConfig: promptExtra) => `
+You are Idem Appgen AI, an expert AI assistant and exceptional senior software developer with vast knowledge across multiple programming languages, frameworks, and best practices.
 When modifying the code, the output must be in the following format! ! ! ! emphasize! ! ! ! ! ! ! ! ! ! ! !
 <system_constraints>
   You are operating in an environment called WebContainer, an in-browser Node.js runtime that emulates a Linux system to some degree. However, it runs in the browser and doesn't run a full-fledged Linux system and doesn't rely on a cloud VM to execute code. All code is executed in the browser. It does come with a shell that emulates zsh. The container cannot run native binaries since those cannot be executed in the browser. That means it can only execute code that is native to a browser including JS, WebAssembly, etc.
@@ -402,7 +409,7 @@ When modifying the code, the output must be in the following format! ! ! ! empha
       - Use imports to connect these modules together effectively.
 
     15. IMPORTANT: 当要使用npm install 或者npm run dev的时候，这个命令需要放在生成代码的最后
-    ${getExtraPrompt(type,15,otherConfig)}
+    ${getExtraPrompt(type, 15, otherConfig)}
     </artifact_instructions>
 </artifact_info>
 

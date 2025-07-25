@@ -14,11 +14,11 @@ export function ActivityBar({
   activeView,
   onViewChange,
   onToggleTerminal,
-  showTerminal
+  showTerminal,
 }: ActivityBarProps) {
   // GitHub 仓库链接
   const handleGithubClick = () => {
-    window.open('https://github.com/we0-dev/we0', '_blank');
+    window.open("https://github.com/idem appgen-dev/idem appgen", "_blank");
   };
 
   return (
@@ -57,8 +57,6 @@ export function ActivityBar({
         </button>
       </Tooltip>
 
-
-
       <div className="flex-grow" />
 
       <Tooltip content="Terminal" side="right">
@@ -69,7 +67,7 @@ export function ActivityBar({
             showTerminal
               ? "bg-white dark:bg-[#37373D] text-[#424242] dark:text-white"
               : "text-[#616161] dark:text-[#858585] hover:text-[#424242] hover:bg-[#e8e8e8] dark:hover:text-white dark:hover:bg-[#37373D]",
-              showTerminal &&
+            showTerminal &&
               "before:absolute before:left-0 before:top-[20%] before:h-[60%] before:w-[2px] before:bg-[#424242] dark:before:bg-white before:-ml-2"
           )}
           onClick={onToggleTerminal}

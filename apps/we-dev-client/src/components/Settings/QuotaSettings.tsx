@@ -6,19 +6,24 @@ import { useTranslation } from "react-i18next";
 
 export function QuotaSettings() {
   const { t } = useTranslation();
-  const { user, fetchUser, isLoading: loading, openLoginModal } = useUserStore();
-  
+  const {
+    user,
+    fetchUser,
+    isLoading: loading,
+    openLoginModal,
+  } = useUserStore();
+
   useEffect(() => {
     fetchUser();
   }, []);
 
-  if(!user?.id){
+  if (!user?.id) {
     return (
       <div className="flex flex-col items-center justify-center h-[200px] text-gray-400">
         <div className="mb-4 translate">{t("common.please_login")}</div>
         <button
           onClick={() => {
-            openLoginModal()
+            openLoginModal();
           }}
           className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-1.5 transition-colors text-[14px]"
         >
@@ -27,7 +32,7 @@ export function QuotaSettings() {
       </div>
     );
   }
-  
+
   const userQuota = user.userQuota || {
     quota: 0,
     resetTime: new Date(),
@@ -35,11 +40,11 @@ export function QuotaSettings() {
     refillQuota: 0,
     usedQuota: 0,
     quotaTotal: 0,
-    tierMessage:{
+    tierMessage: {
       startTime: new Date(),
       tier: TierType.FREE,
-      resetTime: new Date()
-    }
+      resetTime: new Date(),
+    },
   };
 
   if (loading) {
@@ -105,7 +110,7 @@ export function QuotaSettings() {
       {/* Buy More Button */}
       <button
         onClick={() => {
-          const url = "https://we0.ai/user";
+          const url = "https://idem appgen.ai/user";
           if (window.electron?.ipcRenderer) {
             window.electron.ipcRenderer.send("open:external:url", url);
           } else {
