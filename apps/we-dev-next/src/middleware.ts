@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import acceptLanguage from "accept-language";
 import { locales } from "./utils/lang";
 
-acceptLanguage.languages(locales)
+acceptLanguage.languages(locales);
 
 // CORS configuration
 const CORS_HEADERS = {
@@ -14,14 +14,13 @@ const CORS_HEADERS = {
   "Access-Control-Allow-Credentials": "true",
 } as const;
 
-
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-    // Handle CORS preflight requests
-    if (request.method === "OPTIONS") {
-      return new NextResponse(null, { status: 200, headers: CORS_HEADERS });
-    }
+  // Handle CORS preflight requests
+  if (request.method === "OPTIONS") {
+    return new NextResponse(null, { status: 200, headers: CORS_HEADERS });
+  }
 
   if (pathname.startsWith("/wedev_public")) {
     const response = NextResponse.next();
@@ -41,4 +40,4 @@ export const config = {
     "/wedev/:path*",
   ],
   runtime: "nodejs",
-}
+};

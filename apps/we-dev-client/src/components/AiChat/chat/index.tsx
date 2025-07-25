@@ -21,6 +21,8 @@ import useChatModeStore from "../../../stores/chatModeSlice";
 import useTerminalStore from "@/stores/terminalSlice";
 import {checkExecList, checkFinish} from "../utils/checkFinish";
 import {useUrlData} from "@/hooks/useUrlData";
+import {getProjectById} from "@/api/persistence/db";
+import {WebGenService} from "./services/appGenService";
 import {MCPTool} from "@/types/mcp";
 import useMCPTools from "@/hooks/useMCPTools";
 
@@ -479,7 +481,39 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
             }
         },
     });
-    const {status, type} = useUrlData({append});
+    const {status, type, projectId} = useUrlData({append});
+    
+    // Effet pour charger les données du projet si un projectId est présent dans l'URL
+    useEffect(() => {
+      const loadProjectData = async () => {
+        if (projectId) {
+          try {
+            const project = await getProjectById(projectId);
+            if (project) {
+              // Formater les données du projet pour le chat
+              const webGenService = new WebGenService();
+              const projectPrompt = webGenService.generateWebsitePrompt(project);
+              
+              // Envoyer le prompt formaté au chat
+              append({
+                id: uuidv4(),
+                role: "user",
+                content: projectPrompt
+              });
+              
+              console.log("Project data loaded and sent to chat:", project.name);
+            } else {
+              console.warn("Project not found with ID:", projectId);
+            }
+          } catch (error) {
+            console.error("Error loading project data:", error);
+            toast.error("Erreur lors du chargement des données du projet");
+          }
+        }
+      };
+      
+      loadProjectData();
+    }, [projectId, append]);
 
     // listen to url when official website jumps in
     useEffect(() => {

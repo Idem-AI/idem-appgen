@@ -5,6 +5,7 @@ interface ParsedData {
   text: string;
   images: string[];
   type: string;
+  projectId?: string;
 }
 
 /**
@@ -21,7 +22,9 @@ export function parseDataFromUrl(): ParsedData {
     
     // Return default value if no data parameter exists
     if (!encodedData) {
-      return { text: '', images: [], type: '' };
+      // Check if projectId exists as a direct URL parameter
+      const projectId = urlParams.get('projectId') || '';
+      return { text: '', images: [], type: '', projectId };
     }
     
     // Decode and parse JSON data
@@ -31,11 +34,12 @@ export function parseDataFromUrl(): ParsedData {
     return {
       text: decodedData.text || '',
       images: Array.isArray(decodedData.images) ? decodedData.images : [],
-      type: decodedData.type || ''
+      type: decodedData.type || '',
+      projectId: decodedData.projectId || urlParams.get('projectId') || ''
     };
   } catch (error) {
     console.error('Error parsing URL data:', error);
     // Return default value on error
-    return { text: '', images: [], type: '' };
+    return { text: '', images: [], type: '', projectId: '' };
   }
 }

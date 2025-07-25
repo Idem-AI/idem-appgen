@@ -17,6 +17,7 @@ interface UseUrlDataReturn {
   status: boolean;
   type: string;
   text: string;
+  projectId: string;
 }
 
 interface Iprops {
@@ -105,7 +106,13 @@ export function useUrlData(props?: Iprops): UseUrlDataReturn {
     }
   };
 
-  return { status: loadingRef.current, type: typeRef.current, text: parseDataFromUrl().text };
+  const parsedData = parseDataFromUrl();
+  return { 
+    status: loadingRef.current, 
+    type: typeRef.current, 
+    text: parsedData.text,
+    projectId: parsedData.projectId || ''
+  };
 }
 
 /**
