@@ -10,7 +10,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 
 
-// 添加一个递归获取文件的辅助函数
+// Add a helper function to recursively get all files
 const getAllFiles = async (webcontainer: any, dirPath: string, zip: JSZip, baseDir: string = '') => {
   try {
     const entries = await webcontainer.fs.readdir(dirPath, { withFileTypes: true });
@@ -19,39 +19,39 @@ const getAllFiles = async (webcontainer: any, dirPath: string, zip: JSZip, baseD
       const fullPath = `${dirPath}/${entry.name}`;
       try {
         if (entry.isDirectory()) {
-          // 如果是目录，递归处理
+          // If it's a directory, recursively process it
           await getAllFiles(webcontainer, fullPath, zip, `${baseDir}${entry.name}/`);
         } else {
-          // 如果是文件，读取内容并添加到zip
+          // If it's a file, read its content and add it to the zip
           const content = await webcontainer.fs.readFile(fullPath);
           const relativePath = `${baseDir}${entry.name}`;
           console.log('Adding file:', relativePath);
           zip.file(relativePath, content);
         }
       } catch (error) {
-        console.error(`处理文件 ${entry.name} 失败:`, error);
+        console.error(`Failed to process file ${entry.name}:`, error);
       }
     }
   } catch (error) {
-    console.error(`读取目录 ${dirPath} 失败:`, error);
+    console.error(`Failed to read directory ${dirPath}:`, error);
     
-    // 如果不支持 withFileTypes，尝试普通的 readdir
+    // If it doesn't support withFileTypes, try the regular readdir
     const files = await webcontainer.fs.readdir(dirPath);
     
     for (const file of files) {
       const fullPath = `${dirPath}/${file}`;
       try {
-        // 尝试读取文件内容
+        // Try to read the file content
         const content = await webcontainer.fs.readFile(fullPath);
         const relativePath = `${baseDir}${file}`;
         console.log('Adding file:', relativePath);
         zip.file(relativePath, content);
       } catch (error) {
-        // 如果读取失败，可能是目录，尝试递归
+        // If reading fails, it might be a directory, try recursively
         try {
           await getAllFiles(webcontainer, fullPath, zip, `${baseDir}${file}/`);
         } catch (dirError) {
-          console.error(`处理文件/目录 ${file} 失败:`, dirError);
+          console.error(`Failed to process file/directory ${file}:`, dirError);
         }
       }
     }
@@ -71,7 +71,7 @@ export function HeaderActions() {
     try {
       const zip = new JSZip();
       Object.entries(files).forEach(([path, content]) => {
-        // 打包dist目录
+        // Pack the dist directory
         zip.file(path, content as string);
       });
       const blob = await zip.generateAsync({ type: "blob" });
@@ -84,7 +84,7 @@ export function HeaderActions() {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error) {
-      console.error("下载失败:", error);
+      console.error("Failed to download:", error);
     }
   };
   const publish = async () => {
@@ -125,14 +125,14 @@ export function HeaderActions() {
             toast.success(t('header.deploySuccess'));
           }
         } catch (error) {
-          console.error("读取 dist 目录失败:", error);
+          console.error("Failed to read dist directory:", error);
           toast.error(t('header.error.deploy_failed'));
         } finally {
           setIsDeploying(false);
         }
       });
     } catch (error) {
-      console.error("部署失败:", error);
+      console.error("Failed to deploy:", error);
       toast.error(t('header.error.deploy_failed'));
       setIsDeploying(false);
     }
@@ -142,7 +142,7 @@ export function HeaderActions() {
     try {
       await navigator.clipboard.writeText(deployUrl);
     } catch (err) {
-      console.error('复制失败:', err);
+      console.error('Failed to copy:', err);
     }
   };
 
