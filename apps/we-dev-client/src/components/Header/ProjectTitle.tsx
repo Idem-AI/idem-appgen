@@ -1,14 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Sidebar } from "../Sidebar";
 import { db } from "../../utils/indexDB";
-import useUserStore from "../../stores/userSlice";
+import { getCurrentUser } from "../../api/persistence/db";
+import type { UserModel } from "../../api/persistence/userModel";
 import { useTranslation } from "react-i18next";
 
 export function ProjectTitle() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [chatCount, setChatCount] = useState(0);
   const timeoutRef = useRef<NodeJS.Timeout>();
-  const { user, isAuthenticated } = useUserStore();
+  const [user, setUser] = useState<UserModel | null>(null);
   const { t } = useTranslation();
   const getInitials = (name: string) => {
     return (
@@ -36,6 +37,20 @@ export function ProjectTitle() {
     };
   }, []);
 
+  // Fetch user data
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const currentUser = await getCurrentUser();
+        setUser(currentUser);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
   const handleMouseEnter = () => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -61,21 +76,22 @@ export function ProjectTitle() {
           w-6 h-6 rounded-full
           flex items-center justify-center
           text-white text-xs font-medium
-          ${user?.avatar ? "" : "bg-purple-500 dark:bg-purple-600"}
+          ${user?.photoURL ? "" : "bg-purple-500 dark:bg-purple-600"}
         `}
           style={
-            user?.avatar
+            user?.photoURL
               ? {
-                  backgroundImage: `url(${user.avatar})`,
+                  backgroundImage: `url(${user.photoURL})`,
                   backgroundSize: "cover",
                 }
               : undefined
           }
         >
-          {!user?.avatar && getInitials(user?.username || "?")}
+          {!user?.photoURL &&
+            getInitials(user?.displayName || user?.email || "?")}
         </div>
         <span className="text-gray-900 dark:text-white text-[14px] font-normal">
-          {isAuthenticated ? user?.username : "Guest"}
+          {user ? user.displayName || user.email : "Guest"}
         </span>
 
         <svg
@@ -115,7 +131,7 @@ export function ProjectTitle() {
         onClose={() => setIsSidebarOpen(false)}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        username={user?.username || t("login.guest")}
+        username={user?.displayName || user?.email || t("login.guest")}
       />
     </div>
   );

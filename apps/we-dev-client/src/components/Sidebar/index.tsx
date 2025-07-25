@@ -5,6 +5,8 @@ import { db } from "../../utils/indexDB";
 import { eventEmitter } from "../AiChat/utils/EventEmitter";
 import useUserStore from "../../stores/userSlice";
 import { useTranslation } from "react-i18next";
+import { getCurrentUser } from "../../api/persistence/db";
+import type { UserModel } from "../../api/persistence/userModel";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -23,7 +25,21 @@ export function Sidebar({
   onChatSelect,
 }: SidebarProps) {
   const { t } = useTranslation();
-  const { user, isAuthenticated, logout, openLoginModal } = useUserStore();
+  const { user: storeUser, isAuthenticated, logout, openLoginModal } = useUserStore();
+  const [currentUser, setCurrentUser] = useState<UserModel | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const user = await getCurrentUser();
+        setCurrentUser(user);
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
+    };
+    
+    fetchUser();
+  }, []);
 
   const [settingsState, setSettingsState] = useState<{
     isOpen: boolean;
@@ -147,81 +163,138 @@ export function Sidebar({
     }
   };
   const renderUserSection = () => {
-    if (!isAuthenticated) {
+    // First check for user from persistence API
+    if (currentUser) {
       return (
         <div
           className="p-3 cursor-pointer hover:bg-white/5"
-          onClick={() => {
-            openLoginModal();
-          }}
+          onClick={() => openSettings(TAB_KEYS.Quota)}
         >
           <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-full bg-gray-600 flex items-center justify-center text-white text-[14px] font-medium">
-              ?
+            <div
+              className={`
+            w-9 h-9 rounded-full
+            flex items-center justify-center
+            text-white text-xs font-medium
+            ${currentUser.photoURL ? "" : "bg-purple-500 dark:bg-purple-600"}
+          `}
+              style={
+                currentUser.photoURL
+                  ? {
+                      backgroundImage: `url(${currentUser.photoURL})`,
+                      backgroundSize: "cover",
+                    }
+                  : undefined
+              }
+            >
+              {!currentUser.photoURL && getInitials(currentUser.displayName || currentUser.email || "?")}
             </div>
             <div className="flex-1">
               <div className="dark:text-white text-[14px] font-medium">
-                {t("login.title")}
+                {currentUser.displayName || currentUser.email}
               </div>
-              <div className="text-[13px] text-gray-400 translate">
-                {t("login.click_to_login")}
+              <div className="text-[13px] text-gray-400 translate uppercase">
+                {`${currentUser.subscription} plan`}
               </div>
             </div>
+            <button
+              onClick={handleLogout}
+              className="text-gray-400 hover:text-white"
+            >
+              <svg
+                className="w-[16px] h-[16px]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      );
+    } 
+    // Fallback to user store if persistence API user isn't available
+    else if (isAuthenticated) {
+      return (
+        <div
+          className="p-3 cursor-pointer hover:bg-white/5"
+          onClick={() => openSettings(TAB_KEYS.Quota)}
+        >
+          <div className="flex items-center gap-2">
+            <div
+              className={`
+            w-9 h-9 rounded-full
+            flex items-center justify-center
+            text-white text-xs font-medium
+            ${storeUser?.avatar ? "" : "bg-purple-500 dark:bg-purple-600"}
+          `}
+              style={
+                storeUser?.avatar
+                  ? {
+                      backgroundImage: `url(${storeUser.avatar})`,
+                      backgroundSize: "cover",
+                    }
+                  : undefined
+              }
+            >
+              {!storeUser?.avatar && getInitials(storeUser?.username || "?")}
+            </div>
+            <div className="flex-1">
+              <div className="dark:text-white text-[14px] font-medium">
+                {storeUser?.username}
+              </div>
+              <div className="text-[13px] text-gray-400 translate uppercase">
+                {`${storeUser?.userQuota?.tierType} plan`}
+              </div>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="text-gray-400 hover:text-white"
+            >
+              <svg
+                className="w-[16px] h-[16px]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                />
+              </svg>
+            </button>
           </div>
         </div>
       );
     }
-
+    // Not authenticated case
     return (
       <div
         className="p-3 cursor-pointer hover:bg-white/5"
-        onClick={() => openSettings(TAB_KEYS.Quota)}
+        onClick={() => {
+          openLoginModal();
+        }}
       >
         <div className="flex items-center gap-2">
-          <div
-            className={`
-          w-9 h-9 rounded-full
-          flex items-center justify-center
-          text-white text-xs font-medium
-          ${user?.avatar ? "" : "bg-purple-500 dark:bg-purple-600"}
-        `}
-            style={
-              user?.avatar
-                ? {
-                    backgroundImage: `url(${user.avatar})`,
-                    backgroundSize: "cover",
-                  }
-                : undefined
-            }
-          >
-            {!user?.avatar && getInitials(user?.username || "?")}
+          <div className="w-9 h-9 rounded-full bg-gray-600 flex items-center justify-center text-white text-[14px] font-medium">
+            ?
           </div>
           <div className="flex-1">
-            <div className="  dark:text-white text-[14px] font-medium">
-              {user?.username}
+            <div className="dark:text-white text-[14px] font-medium">
+              {t("login.title")}
             </div>
-            <div className="text-[13px] text-gray-400 translate uppercase">
-              {`${user?.userQuota?.tierType} plan`}
+            <div className="text-[13px] text-gray-400 translate">
+              {t("login.click_to_login")}
             </div>
           </div>
-          <button
-            onClick={handleLogout}
-            className="text-gray-400 hover:text-white"
-          >
-            <svg
-              className="w-[16px] h-[16px]"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-              />
-            </svg>
-          </button>
         </div>
       </div>
     );

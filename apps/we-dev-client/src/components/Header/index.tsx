@@ -9,7 +9,8 @@ function Header() {
       </div>
       <img className="w-20 h-auto" src="public/assets/icons/logo_white.png" alt="logo" />
 
-      <h1 className="mt-3 ml-1 opacity-90 text-[18px] font-bold  ">APPGEN</h1>
+      <h1 className="mt-3 ml-1 opacity-90 text-[18px] font-bold">APPGEN</h1>
+      
       <div className="flex-1 flex justify-end">
         <HeaderActions />
       </div>
