@@ -35,11 +35,9 @@ export async function streamResponse(
             const msg = errorCause || err?.errors?.[0]?.responseBody || JSON.stringify(err);
 
             if (msg) {
-                throw new Error(msg);
+                throw new Error(msg, { cause: err });
             }
-            const error = new Error(msg || JSON.stringify(err));
-            error.cause = msg; // Save original error information to cause
-            throw error;
+            throw err;
         },
         onFinish: async (response) => {
             const {text: content, finishReason} = response;

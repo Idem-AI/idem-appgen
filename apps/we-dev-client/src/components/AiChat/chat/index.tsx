@@ -63,6 +63,7 @@ const API_BASE = process.env.APP_BASE_URL;
 console.log(API_BASE, 'API_BASE')
 
 enum ModelTypes {
+    Gemini25Flash = "gemini-2.5-flash",
     Claude37sonnet = "claude-3-7-sonnet-20250219",
     Claude35sonnet = "claude-3-5-sonnet-20240620",
     gpt4oMini = "gpt-4o-mini",
@@ -99,8 +100,8 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
     const [checkCount, setCheckCount] = useState(0);
     const [visible, setVisible] = useState(false);
     const [baseModal, setBaseModal] = useState<IModelOption>({
-        value: ModelTypes.Claude35sonnet,
-        label: "Claude 3.5 Sonnet",
+        value: ModelTypes.Gemini25Flash,
+        label: "Gemini 2.5 Flash",
         useImage: true,
         from: "default",
         quota: 2,
@@ -120,7 +121,7 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
         setOldFiles
     } = useFileStore();
     const {mode} = useChatModeStore();
-    // 使用全局状态
+    // use global state
     const {
         uploadedImages,
         addImages,
@@ -145,7 +146,7 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
 
     const updateConvertToBoltAction = convertToBoltAction(filesUpdateObj);
 
-    // 使用 ollama 模型 获取模型列表
+    // use ollama model to get model list
     useEffect(() => {
         fetch(`${API_BASE}/api/model`, {
             method: "POST",
@@ -214,7 +215,7 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
         }
     }, [updateConvertToBoltAction]);
 
-    // 修改 UUID 的初始化逻辑和消息加载
+    // modify UUID initialization logic and message loading
     const [chatUuid, setChatUuid] = useState(() => propUuid || uuidv4());
 
     const refUuidMessages = useRef([]);
@@ -227,7 +228,7 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
         }
     }, [checkCount]);
 
-    // 添加加载历史消息的函数
+    // add function to load chat history
     const loadChatHistory = async (uuid: string) => {
         try {
             const records = await db.getByUuid(uuid);
@@ -260,14 +261,14 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
                     setMessages(latestRecord.data.messages);
                     setFiles(historyFiles);
                     setOldFiles(oldHistoryFiles);
-                    // 重置其他状态
+                    // Reset other states
                     clearImages();
                     setIsFirstSend();
                     setIsUpdateSend();
                     resetTerminals();
                 }
             } else {
-                // 如果是新对话，清空所有状态
+                // If it's a new conversation, clear all states
                 setMessages([]);
                 clearImages();
                 setIsFirstSend();
@@ -279,17 +280,17 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
         }
     };
 
-    // 监听聊天选择事件
+    // listen to chat selection event
     useEffect(() => {
         const unsubscribe = eventEmitter.on("chat:select", (uuid: string) => {
             if (uuid !== chatUuid) {
                 refUuidMessages.current = [];
                 setChatUuid(uuid || uuidv4());
                 if (uuid) {
-                    // 加载历史记录
+                    // load chat history
                     loadChatHistory(uuid);
                 } else {
-                    // 新对话，清空所有状态
+                    // new conversation, clear all states
                     setMessages([]);
                     setFiles({});
                     clearImages();
@@ -308,7 +309,7 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
             }
         });
 
-        // 清理订阅
+        // clean up subscription
         return () => unsubscribe();
     }, [chatUuid, files]);
     const token = useUserStore.getState().token;
@@ -332,7 +333,7 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
         }
     }, [enabledMCPs])
 
-    // 修改 useChat 配置
+    // modify useChat configuration
     const {
         messages: realMessages,
         input,
@@ -359,7 +360,7 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
                     backendLanguage: otherConfig.backendLanguage
                 },
             },
-            // 如果模型支持 function call 且有启用的 MCP 工具，则添加 tools 配置
+            // if the model supports function call and there are enabled MCP tools, add tools configuration
             ...(baseModal.functionCall && mcpTools.length > 0 && {
                 tools: mcpTools.map(tool => ({
                     id: tool.id,
@@ -472,7 +473,7 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
             if (String(error).includes("Authentication required")) {
                 openModal("login");
             }
-            // 添加对 Ollama 错误的处理
+            // add Ollama error handling
             if (baseModal.from === "ollama") {
                 toast.error("Ollama server connection failed, please check configuration");
             }
@@ -480,7 +481,7 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
     });
     const {status, type} = useUrlData({append});
 
-    // 官网跳转进来监听 url
+    // listen to url when official website jumps in
     useEffect(() => {
         if (status && type === "sketch") {
             showGuide();
@@ -528,30 +529,30 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
     const [userScrolling, setUserScrolling] = useState(false)
     const userScrollTimeoutRef = useRef<NodeJS.Timeout>()
 
-    // 处理用户滚动
+    // handle user scrolling
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const target = e.target as HTMLDivElement
         const isScrolledToBottom = Math.abs(target.scrollHeight - target.scrollTop - target.clientHeight) < 10
 
         if (!isScrolledToBottom) {
-            // 用户正在滚动查看历史消息
+            // user is scrolling to view history messages
             setUserScrolling(true)
             
-            // 清除之前的定时器
+            // clear previous timer
             if (userScrollTimeoutRef.current) {
                 clearTimeout(userScrollTimeoutRef.current)
             }
             
-            // 设置新的定时器，3秒后允许自动滚动
+            // set new timer, allow auto scroll after 3 seconds
             userScrollTimeoutRef.current = setTimeout(() => {
                 setUserScrolling(false)
             }, 3000)
         }
     }
 
-    // 修改滚动到底部的函数
+    // modify scroll to bottom function
     const scrollToBottom = () => {
-        if (userScrolling) return // 如果用户正在滚动，不执行自动滚动
+        if (userScrolling) return // if user is scrolling, do not execute auto scroll
 
         const messageContainer = document.querySelector('.message-container')
         if (messageContainer) {
@@ -559,7 +560,7 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
         }
     }
 
-    // 在组件卸载时清理定时器
+    // clean up timer when component unmounts
     useEffect(() => {
         return () => {
             if (userScrollTimeoutRef.current) {
@@ -568,10 +569,10 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
         }
     }, [])
 
-    // 添加上传状态跟踪
+    // add upload status tracking
     const [isUploading, setIsUploading] = useState(false);
     const filterMessages = messages.filter((e) => e.role !== "system");
-    // 修改上传处理函数
+    // modify upload handler
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files?.length || isUploading) return;
         setIsUploading(true);
@@ -621,7 +622,7 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
         e.target.value = "";
     };
 
-    // 修改提交处理函数
+    // modify submit handler
     const handleSubmitWithFiles = async (
         _: React.KeyboardEvent,
         text?: string
@@ -629,11 +630,11 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
         if (!text && !input.trim() && uploadedImages.length === 0) return;
 
         try {
-            // 处理文件引用
+            // process file references
             // const processedInput = await processFileReferences(input);
-            // 如果是 ollama类型 模型 需要走单独逻辑，不走云端
+            // if it is ollama type model, need to use separate logic, not use cloud
 
-            // 保存当前的图片附件
+            // save current images attachments
             const currentAttachments = uploadedImages.map((img) => ({
                 id: img.id,
                 name: img.id,
@@ -643,7 +644,7 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
                 url: img.url,
             }));
             console.log(JSON.stringify(uploadedImages), JSON.stringify(currentAttachments), 'currentAttachments')
-            // 先清理图片状态
+            // clear images state
             clearImages();
 
             append(
@@ -665,7 +666,7 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
         }
     };
 
-    // 修改键盘提交处理
+    // modify keyboard submit handler
     const handleKeySubmit = (e: React.KeyboardEvent) => {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
@@ -673,7 +674,7 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
         }
     };
 
-    // 修改粘贴处理函数
+    // modify paste handler
     const handlePaste = async (e: ClipboardEvent) => {
         if (isUploading) return;
 
@@ -728,7 +729,7 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
         }
     };
 
-    // 添加粘贴事件监听
+    // add paste event listener
     useEffect(() => {
         const textarea = textareaRef.current;
         if (!textarea) return;
@@ -739,7 +740,7 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
         };
     }, []);
 
-    // 添加拖拽处理函数
+    // add drag over handler
     const handleDragOver = (e: React.DragEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -791,7 +792,7 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
         return (
             <div
                 className="flex-1 overflow-y-auto px-1 py-2 message-container [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-                onScroll={handleScroll}  // 添加滚动事件监听
+                onScroll={handleScroll}  // add scroll event listener
             >
                         <Tips
             append={append}
@@ -802,7 +803,7 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
                     {filterMessages.map((message, index) => (
                         <MessageItem
                             handleRetry={() => {
-                                // 测试
+                                // test
                                 reload();
                             }} 
                             key={`${message.id}-${index}`}
@@ -868,13 +869,13 @@ export const BaseChat = ({uuid: propUuid}: { uuid?: string }) => {
         );
     }, [messages, isLoading, setInput, handleFileSelect]);
 
-    // 显示引导弹窗
+    // show guide modal
     const showGuide = () => setVisible(true);
 
-    // 处理文件选择
+    // handle file selected
     const handleFileSelected = () => {
         console.log('handleFileSelected')
-        // 处理上传逻辑
+        // handle upload logic
         setVisible(false);
     };
 

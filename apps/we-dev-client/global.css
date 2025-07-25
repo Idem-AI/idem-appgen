@@ -8,8 +8,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import "primeicons/primeicons.css";
-
 * {
   font-family: "Jura", sans-serif;
   font-optical-sizing: auto;

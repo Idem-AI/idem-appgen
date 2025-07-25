@@ -46,12 +46,7 @@ export function getOpenAIModel(baseURL: string, apiKey: string, model: string) {
     return openai(model);
   }
 
-  const openai = createOpenAI({
-    baseURL,
-    apiKey,
-  });
-  initOptions = {};
-  return openai(model);
+  throw new Error(`Provider not found for model: ${model}`);
 }
 
 export type Messages = Message[];
@@ -81,10 +76,19 @@ export function streamTextFn(
   options?: StreamingOptions,
   modelKey?: string
 ) {
+  console.log(`Attempting to use model: ${modelKey}`);
+  console.log(`Available models: ${modelConfig.map(m => m.modelKey).join(', ')}`);
+  
+  const modelConf = modelConfig.find((item) => item.modelKey === modelKey);
+
+  if (!modelConf) {
+    throw new Error(`Model configuration not found for model: ${modelKey}`);
+  }
+
   const {
     apiKey = process.env.THIRD_API_KEY,
     apiUrl = process.env.THIRD_API_URL,
-  } = modelConfig.find((item) => item.modelKey === modelKey);
+  } = modelConf;
   const model = getOpenAIModel(apiUrl, apiKey, modelKey) as LanguageModel;
   const newMessages = messages.map((item) => {
     if (item.role === "assistant") {
