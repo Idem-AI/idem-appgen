@@ -2,11 +2,14 @@ import useThemeStore from "@/stores/themeSlice";
 import { useState, useEffect, useRef } from "react";
 import useChatStore from "@/stores/chatSlice";
 import i18n from "@/utils/i18";
+import { getProjectById } from "@/api/persistence/db";
+import { toast } from "react-toastify";
 
 import { useTranslation } from "react-i18next";
-import { Switch, Select, Input, Radio, message } from "antd";
+import { message } from "antd";
 import { BackendSettings } from "./BackendSettings";
 import classNames from "classnames";
+import { ProjectModel } from "@/api/persistence/models/project.model";
 
 interface OtherConfig {
   isBackEnd: boolean;
@@ -190,6 +193,12 @@ export function GeneralSettings() {
   const { setOtherConfig, otherConfig } = useChatStore();
   const { isDarkMode, toggleTheme, setTheme } = useThemeStore();
   const [activeTab, setActiveTab] = useState("general");
+  // Get projectId from URL in a web-compatible way
+  const urlParams = new URLSearchParams(window.location.search);
+  const projectId = urlParams.get("projectId");
+  const [project, setProject] = useState<ProjectModel | null>(null);
+  const projectLoadedRef = useRef(false);
+
   const [formData, setFormData] = useState<FormData>(() => {
     const savedData = JSON.parse(
       localStorage.getItem("settingsConfig") || "{}"
@@ -215,6 +224,38 @@ export function GeneralSettings() {
   useEffect(() => {
     localStorage.setItem("settingsConfig", JSON.stringify(formData));
   }, [formData]);
+
+  // Load project data when component mounts if projectId is present
+  useEffect(() => {
+    const loadProjectData = async () => {
+      // Check if project is already loaded or if there's no projectId
+      if (!projectId || projectLoadedRef.current) {
+        return;
+      }
+
+      try {
+        // Mark project as being loaded
+        projectLoadedRef.current = true;
+        console.log("Loading project data with ID:", projectId);
+
+        const projectData = await getProjectById(projectId);
+        if (projectData) {
+          setProject(projectData);
+          console.log("Project data loaded:", projectData.name);
+        } else {
+          console.warn("Project not found with ID:", projectId);
+          toast.error(t("settings.projectNotFound"));
+        }
+      } catch (error) {
+        console.error("Error loading project data:", error);
+        toast.error(t("settings.errorLoadingProject"));
+        // Reset flag to allow another loading attempt
+        projectLoadedRef.current = false;
+      }
+    };
+
+    loadProjectData();
+  }, [projectId, t]);
 
   // Load theme settings from local storage when component mounts
   useEffect(() => {
@@ -537,40 +578,74 @@ export function GeneralSettings() {
 
         {/* 设置表单 */}
         <div className="p-4 space-y-6">
-          <BackendSettings
-            otherConfig={otherConfig}
-            updateConfig={updateConfig}
+          {activeTab === "general" ? (
+            <div className="space-y-6">
+              <BackendSettings project={project} />
+              {projectId && !project && (
+                <div className="p-3 bg-yellow-50 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200 rounded-lg">
+                  {t("settings.loadingProjectData", "Loading project data...")}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {/* 主题切换 */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t("settings.themeMode")}
+                </label>
+                <CustomSelect
+                  value={currentTheme}
+                  onChange={(value) => handleThemeChange(value)}
+                  options={[
+                    { value: "light", label: t("settings.themeModeLight") },
+                    { value: "dark", label: t("settings.themeModeDark") },
+                  ]}
+                />
+              </div>
+
+              {/* 语言选择 */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t("settings.Language")}
+                </label>
+                <CustomSelect
+                  value={formData.language}
+                  onChange={(value) => handleLanguageChange(value)}
+                  options={[
+                    { value: "en", label: "English" },
+                    { value: "zh", label: "中文" },
+                  ]}
+                />
+              </div>
+            </div>
+          )}
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            {t("settings.themeMode")}
+          </label>
+          <CustomSelect
+            value={currentTheme}
+            onChange={(value) => handleThemeChange(value)}
+            options={[
+              { value: "light", label: t("settings.themeModeLight") },
+              { value: "dark", label: t("settings.themeModeDark") },
+            ]}
           />
+        </div>
 
-          {/* 主题切换 */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              {t("settings.themeMode")}
-            </label>
-            <CustomSelect
-              value={currentTheme}
-              onChange={(value) => handleThemeChange(value)}
-              options={[
-                { value: "light", label: t("settings.themeModeLight") },
-                { value: "dark", label: t("settings.themeModeDark") },
-              ]}
-            />
-          </div>
-
-          {/* 语言选择 */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              {t("settings.Language")}
-            </label>
-            <CustomSelect
-              value={formData.language}
-              onChange={(value) => handleLanguageChange(value)}
-              options={[
-                { value: "en", label: "English" },
-                { value: "zh", label: "中文" },
-              ]}
-            />
-          </div>
+        {/* 语言选择 */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            {t("settings.Language")}
+          </label>
+          <CustomSelect
+            value={formData.language}
+            onChange={(value) => handleLanguageChange(value)}
+            options={[
+              { value: "en", label: "English" },
+              { value: "zh", label: "中文" },
+            ]}
+          />
         </div>
       </div>
     </div>

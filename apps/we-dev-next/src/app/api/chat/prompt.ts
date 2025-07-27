@@ -95,10 +95,44 @@ export enum typeEnum {
   MiniProgram = "miniProgram",
   Other = "other",
 }
+// Legacy interface for backward compatibility
 export interface promptExtra {
   isBackEnd: boolean;
   backendLanguage: string;
   extra: object;
+}
+
+// New ProjectModel interface for project-based configuration
+interface ProjectModel {
+  id?: string;
+  name: string;
+  description: string;
+  type: 'web' | 'mobile' | 'iot' | 'desktop';
+  analysisResultModel?: {
+    development?: {
+      configs?: {
+        backend?: {
+          language?: string;
+          framework: string;
+          apiType: string;
+          orm?: string;
+          features?: string[] | Record<string, boolean>;
+        };
+        database?: {
+          provider: string;
+          version?: string;
+          orm?: string;
+          features?: string[] | Record<string, boolean>;
+        };
+        projectConfig?: {
+          authentication?: boolean;
+          authorization?: boolean;
+          paymentIntegration?: boolean;
+          [key: string]: any;
+        };
+      };
+    };
+  };
 }
 export interface ParametersSchema {
   type: string;
@@ -117,7 +151,7 @@ export interface ToolInfo {
 const getExtraPrompt = (
   type: typeEnum,
   startNum: number = 15,
-  extra: promptExtra = void 0
+  extra: promptExtra | ProjectModel = void 0
 ) => {
   const promptArr = [];
   promptArr.push(
@@ -143,7 +177,10 @@ const getExtraPrompt = (
   }
 
   if (extra) {
-    const ret = resolveExtra(extra);
+    // Check if it's the new ProjectModel or legacy promptExtra
+    const ret = 'analysisResultModel' in extra 
+      ? resolveProjectConfig(extra as ProjectModel)
+      : resolveExtra(extra as promptExtra);
     promptArr.unshift(...ret);
   }
 
@@ -155,6 +192,7 @@ const getExtraPrompt = (
   return prompt;
 };
 
+// Legacy function for backward compatibility
 function resolveExtra(extra: promptExtra) {
   const promptArr = [];
   if (extra.isBackEnd) {
@@ -197,6 +235,84 @@ function resolveExtra(extra: promptExtra) {
       "IMPORTANT: Use localhost for backend address, do not use remote ip addresses, especially not database ones, connect frontend to backend, abstract frontend-backend interface connections into an api.js, and separate frontend and backend files, put frontend files under src, package.json in current directory, backend files in backend directory."
     );
   }
+  return promptArr;
+}
+
+// New function to resolve project-based configuration
+function resolveProjectConfig(project: ProjectModel) {
+  const promptArr = [];
+  const developmentConfig = project.analysisResultModel?.development?.configs;
+  
+  if (!developmentConfig) {
+    return promptArr;
+  }
+
+  const backendConfig = developmentConfig.backend;
+  const databaseConfig = developmentConfig.database;
+  const projectConfig = developmentConfig.projectConfig;
+
+  // Backend configuration
+  if (backendConfig && backendConfig.language) {
+    promptArr.push(
+      "IMPORTANT: You must generate backend code, do not only generate frontend code"
+    );
+    promptArr.push("IMPORTANT: Backend must handle CORS for all domains");
+    
+    const language = (backendConfig.language || "java").toLowerCase();
+    promptArr.push(`IMPORTANT: Use ${backendConfig.language} as the backend language with ${backendConfig.framework} framework.`);
+    promptArr.push(`IMPORTANT: Implement ${backendConfig.apiType} API endpoints.`);
+    
+    if (backendConfig.orm) {
+      promptArr.push(`IMPORTANT: Use ${backendConfig.orm} as ORM for database operations.`);
+    }
+
+    // Backend features
+    const backendFeatures = backendConfig.features;
+    if (backendFeatures) {
+      if (Array.isArray(backendFeatures)) {
+        backendFeatures.forEach(feature => {
+          promptArr.push(`IMPORTANT: Implement ${feature} functionality in the backend.`);
+        });
+      } else {
+        Object.entries(backendFeatures).forEach(([feature, enabled]) => {
+          if (enabled) {
+            promptArr.push(`IMPORTANT: Implement ${feature} functionality in the backend.`);
+          }
+        });
+      }
+    }
+  }
+
+  // Database configuration
+  if (databaseConfig && databaseConfig.provider && databaseConfig.provider !== 'none') {
+    const databasePromptArr = databaseeFunctionRegister[databaseConfig.provider.toLowerCase()]?.(project) || [];
+    promptArr.push(...databasePromptArr);
+  } else {
+    promptArr.push(
+      "IMPORTANT: Backend does not need database, use Map for storage"
+    );
+  }
+
+  // Project configuration features
+  if (projectConfig) {
+    if (projectConfig.authentication) {
+      promptArr.push("IMPORTANT: Implement user authentication system.");
+    }
+    if (projectConfig.authorization) {
+      promptArr.push("IMPORTANT: Implement role-based authorization system.");
+    }
+    if (projectConfig.paymentIntegration) {
+      promptArr.push("IMPORTANT: Implement payment integration functionality.");
+    }
+  }
+
+  promptArr.push(
+    `IMPORTANT: Write the defined interfaces into a json file named api.json, json (URL with complete ip+port) format as {"id":"root","name":"APICollection","type":"folder","children":[{"id":"folder-1","type":"folder","name":""//folder name,"children":[{"id":"1","type":"api","name":"","method":"",//GET"url":"","headers":[{"key":"","value":""}],"query":[{"key":"","value":""}],"cookies":[{"key":"","value":""}]},{"id":"2","type":"api","name":"",//API name"method":"",//POSTorPUTorDELETE"url":"","headers":[{"key":"","value":""}],"query":[{"key":"","value":""}],"cookies":[{"key":"","value":""}],"bodyType":"",//jsonorformDataorurlencodedorrawornoneorbinary"body":{"none":"","formData":[],"urlencoded":[],"raw":"","json":{},"binary":null}}]}]}`
+  );
+  promptArr.push(
+    "IMPORTANT: Use localhost for backend address, do not use remote ip addresses, especially not database ones, connect frontend to backend, abstract frontend-backend interface connections into an api.js, and separate frontend and backend files, put frontend files under src, package.json in current directory, backend files in backend directory."
+  );
+
   return promptArr;
 }
 
