@@ -1,4 +1,3 @@
-import type { Message } from "ai";
 import type { ProjectModel } from "./models/project.model";
 import type { UserModel } from "./userModel";
 

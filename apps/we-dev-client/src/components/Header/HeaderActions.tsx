@@ -1,6 +1,5 @@
 import { useFileStore } from "../WeIde/stores/fileStore";
 import JSZip from "jszip";
-import { OpenDirectoryButton } from "../OpenDirectoryButton";
 import { useTranslation } from "react-i18next";
 import useChatModeStore from "@/stores/chatModeSlice";
 import { ChatMode } from "@/types/chat";
@@ -109,11 +108,11 @@ export function HeaderActions() {
     setShowDeployChoiceModal(false);
 
     if (choice === "idem") {
-      const idemUrl = process.env.IDEM_FRONTEND_URL;
+      const idemUrl = process.env.IDEM_MAIN_APP_URL;
       if (idemUrl) {
-        window.open(idemUrl, "_blank");
+        window.open(`${idemUrl}/console/deployments`, "_blank");
       } else {
-        toast.error("IDEM_FRONTEND_URL not configured");
+        toast.error("IDEM_MAIN_APP_URL not configured");
       }
     } else {
       publishToNetlify();
@@ -153,7 +152,7 @@ export function HeaderActions() {
             method: "POST",
             body: formData,
           });
-          const data = await response.json();
+          const data = await response.json(); 
 
           if (data.success) {
             setDeployUrl(data.url);
