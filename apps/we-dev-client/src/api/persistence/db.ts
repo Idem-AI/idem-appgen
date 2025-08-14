@@ -66,7 +66,7 @@ export async function getProjectById(
   } catch (error) {
     console.error("Error fetching project:", error);
     throw error;
-  }s
+  }
 }
 
 export async function getUserProjects(): Promise<ProjectModel[] | null> {

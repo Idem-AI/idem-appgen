@@ -308,7 +308,6 @@ export function Sidebar({
           flex flex-col text-[14px]
           border-r
           rounded-tr-xl rounded-br-xl
-          overflow-hidden
         `}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}

@@ -1,10 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
-import { ProjectSidebar } from "../Sidebar/ProjectSidebar";
+import { ProjectSidebar, ChatType } from "../Sidebar/ProjectSidebar";
 import { getProjectById } from "../../api/persistence/db";
 import { useUrlData } from "../../hooks/useUrlData";
 import { useTranslation } from "react-i18next";
 
-export function ProjectTitle() {
+interface ProjectTitleProps {
+  onChatTypeChange?: (chatType: ChatType) => void;
+  activeChatType?: ChatType;
+}
+
+export function ProjectTitle({ onChatTypeChange, activeChatType = ChatType.APPLICATION }: ProjectTitleProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout>();
   const [projectData, setProjectData] = useState<any>(null);
@@ -53,6 +58,13 @@ export function ProjectTitle() {
   };
 
   const closeSidebar = () => {
+    setIsSidebarOpen(false);
+  };
+
+  const handleChatSelect = (chatType: ChatType) => {
+    if (onChatTypeChange) {
+      onChatTypeChange(chatType);
+    }
     setIsSidebarOpen(false);
   };
 
@@ -113,6 +125,8 @@ export function ProjectTitle() {
         onClose={closeSidebar}
         onMouseEnter={handleSidebarMouseEnter}
         onMouseLeave={handleSidebarMouseLeave}
+        onChatSelect={handleChatSelect}
+        activeChatType={activeChatType}
       />
     </>
   );

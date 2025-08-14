@@ -26,7 +26,7 @@ function App() {
       <GlobalLimitModal onLogin={openLoginModal} />
       <div
         className={classNames(
-          "h-screen w-screen flex flex-col overflow-hidden",
+          "h-screen w-screen flex flex-col ",
           {
             dark: isDarkMode,
           }

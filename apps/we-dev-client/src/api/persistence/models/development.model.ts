@@ -61,6 +61,11 @@ export interface DevelopmentConfigsModel {
         }
       | string[];
   };
+  landingPageConfig: LandingPageConfig;
+  landingPage?: {
+    url: string;
+    codeUrl: string;
+  };
 
   projectConfig: {
     seoEnabled: boolean;
@@ -73,4 +78,10 @@ export interface DevelopmentConfigsModel {
     paymentIntegration?: boolean;
     customOptions?: Record<string, any>;
   };
+}
+
+export enum LandingPageConfig {
+  NONE = "NONE",
+  SEPARATE = "SEPARATE",
+  INTEGRATED = "INTEGRATED",
 }
