@@ -83,21 +83,26 @@ export function ProjectSidebar({
         return {
           showLandingChat: true,
           showAppChat: true,
-          description: "Deux chats séparés : Landing Page et Application",
+          description: "Two separate chats: Landing Page and Application",
         };
       case LandingPageConfig.INTEGRATED:
         return {
           showLandingChat: false,
           showAppChat: true,
-          description:
-            "Un seul chat pour l'application (avec landing page intégrée)",
+          description: "Single chat for application (with integrated landing page)",
+        };
+      case LandingPageConfig.ONLY_LANDING:
+        return {
+          showLandingChat: true,
+          showAppChat: false,
+          description: "Single chat for landing page only",
         };
       case LandingPageConfig.NONE:
       default:
         return {
           showLandingChat: false,
           showAppChat: true,
-          description: "Un seul chat pour l'application uniquement",
+          description: "Single chat for application only",
         };
     }
   };
@@ -123,7 +128,7 @@ export function ProjectSidebar({
           <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Chats du Projet
+                Project Chats
               </h2>
               <button
                 onClick={onClose}
@@ -160,7 +165,7 @@ export function ProjectSidebar({
                     {projectData.name}
                   </h3>
                   <p className="text-sm text-blue-700 dark:text-blue-300">
-                    {projectData.description || "Aucune description"}
+                    {projectData.description || "No description"}
                   </p>
                 </div>
 
@@ -182,7 +187,7 @@ export function ProjectSidebar({
                 {/* Chat Sections */}
                 <div className="space-y-3">
                   <h4 className="font-medium text-gray-900 dark:text-white">
-                    Chats Disponibles
+                    Available Chats
                   </h4>
 
                   {/* Application Chat */}
@@ -220,7 +225,7 @@ export function ProjectSidebar({
                               {landingPageConfig ===
                               LandingPageConfig.INTEGRATED
                                 ? "App + Landing Page"
-                                : "Application uniquement"}
+                                : "Application only"}
                             </p>
                           </div>
                         </div>
@@ -231,7 +236,7 @@ export function ProjectSidebar({
                               : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
                           }`}
                         >
-                          {hasAppGeneration ? "Prêt" : "À générer"}
+                          {hasAppGeneration ? "Ready" : "To generate"}
                         </div>
                       </div>
                       {activeChatType === ChatType.APPLICATION && (
@@ -287,7 +292,7 @@ export function ProjectSidebar({
                               Landing Page
                             </h5>
                             <p className="text-xs text-gray-600 dark:text-gray-400">
-                              Page d'accueil séparée
+                              Separate landing page
                             </p>
                           </div>
                         </div>
@@ -298,7 +303,7 @@ export function ProjectSidebar({
                               : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
                           }`}
                         >
-                          {hasLandingGeneration ? "Prêt" : "À générer"}
+                          {hasLandingGeneration ? "Ready" : "To generate"}
                         </div>
                       </div>
                       {activeChatType === ChatType.LANDING_PAGE && (
@@ -339,7 +344,7 @@ export function ProjectSidebar({
                       d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                     />
                   </svg>
-                  <p>Projet non trouvé</p>
+                  <p>Project not found</p>
                 </div>
               </div>
             )}

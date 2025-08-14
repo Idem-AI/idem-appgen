@@ -16,6 +16,9 @@ export class MultiChatPromptService {
       case LandingPageConfig.INTEGRATED:
         return this.generateIntegratedPrompt(projectData);
       
+      case LandingPageConfig.ONLY_LANDING:
+        return this.generateLandingOnlyPrompt(projectData);
+      
       case LandingPageConfig.NONE:
       default:
         return this.generateAppOnlyPrompt(projectData);
@@ -30,71 +33,71 @@ export class MultiChatPromptService {
     const techStack = this.getTechStackInfo(projectData);
     
     if (chatType === ChatType.LANDING_PAGE) {
-      return `# Génération de Landing Page Séparée
+      return `# Separate Landing Page Generation
 
 ${baseInfo}
 
-## Objectif
-Créer une landing page séparée et indépendante pour présenter le projet "${projectData.name}".
+## Objective
+Create a separate and independent landing page to present the "${projectData.name}" project.
 
-## Spécifications de la Landing Page
-- **Type**: Page d'accueil marketing séparée de l'application
-- **Objectif**: Présenter le produit, convertir les visiteurs en utilisateurs
-- **Intégration**: Lien vers l'application principale mais code séparé
+## Landing Page Specifications
+- **Type**: Marketing landing page separate from the application
+- **Goal**: Present the product, convert visitors to users
+- **Integration**: Link to main application but separate codebase
 
-## Technologies Recommandées
+## Recommended Technologies
 ${techStack}
 
-## Sections à Inclure
-1. **Hero Section**: Titre accrocheur, sous-titre, CTA principal
-2. **Features**: Principales fonctionnalités du produit
-3. **Benefits**: Avantages pour les utilisateurs
-4. **Social Proof**: Témoignages, logos clients (si applicable)
-5. **Pricing**: Plans tarifaires (si applicable)
-6. **Footer**: Liens utiles, contact, mentions légales
+## Sections to Include
+1. **Hero Section**: Catchy title, subtitle, primary CTA
+2. **Features**: Main product features
+3. **Benefits**: User advantages
+4. **Social Proof**: Testimonials, client logos (if applicable)
+5. **Pricing**: Pricing plans (if applicable)
+6. **Footer**: Useful links, contact, legal notices
 
-## Contraintes
+## Constraints
 ${this.getConstraints(projectData)}
 
 ## Instructions
-- Créez une landing page moderne et responsive
-- Optimisez pour la conversion et le SEO
-- Utilisez des animations subtiles et un design attractif
-- Incluez des CTA clairs vers l'application
-- Assurez-vous que le design soit cohérent avec l'identité de marque
+- Create a modern and responsive landing page
+- Optimize for conversion and SEO
+- Use subtle animations and attractive design
+- Include clear CTAs to the application
+- Ensure design consistency with brand identity
 
-Générez le code complet de la landing page avec tous les fichiers nécessaires.`;
+Generate the complete landing page code with all necessary files.`;
     } else {
-      return `# Génération d'Application (Configuration Séparée)
+      return `# Application Generation (Separate Configuration)
 
 ${baseInfo}
 
-## Objectif
-Créer l'application principale "${projectData.name}" sans landing page intégrée.
+## Objective
+Create the main "${projectData.name}" application without integrated landing page.
 
-## Spécifications de l'Application
-- **Type**: Application web complète
-- **Landing Page**: Séparée (gérée dans un autre chat)
-- **Focus**: Fonctionnalités métier et interface utilisateur
+## Application Specifications
+- **Type**: Complete web application
+- **Landing Page**: Separate (managed in another chat)
+- **Focus**: Business features and user interface
 
 ## Technologies
 ${techStack}
 
-## Fonctionnalités à Développer
+## Features to Develop
 ${this.getFeatures(projectData)}
 
-## Contraintes
+## Constraints
 ${this.getConstraints(projectData)}
 
 ## Instructions
-- Créez une application web complète et fonctionnelle
-- Implémentez toutes les fonctionnalités métier requises
-- Assurez-vous d'une UX/UI excellente
-- Optimisez les performances et la sécurité
-- Incluez l'authentification et la gestion des utilisateurs
-- La landing page sera gérée séparément
+- Create a complete and functional web application
+- Implement all required business features
+- Ensure excellent UX/UI
+- Optimize performance and security
+- Include authentication and user management
+- Landing page will be managed separately
 
-Générez le code complet de l'application avec tous les fichiers nécessaires.`;
+Generate the complete application code with all necessary files.`;
     }
   }
 
@@ -105,43 +108,89 @@ Générez le code complet de l'application avec tous les fichiers nécessaires.`
     const baseInfo = this.getBaseProjectInfo(projectData);
     const techStack = this.getTechStackInfo(projectData);
     
-    return `# Génération d'Application avec Landing Page Intégrée
+    return `# Application Generation with Integrated Landing Page
 
 ${baseInfo}
 
-## Objectif
-Créer une application web complète "${projectData.name}" avec landing page intégrée.
+## Objective
+Create a complete "${projectData.name}" web application with integrated landing page.
 
 ## Architecture
-- **Type**: Application monolithique avec landing page intégrée
-- **Structure**: Landing page + Application dans le même projet
-- **Routing**: Routes séparées pour landing (/), app (/app/*, /dashboard/*, etc.)
+- **Type**: Monolithic application with integrated landing page
+- **Structure**: Landing page + Application in the same project
+- **Routing**: Separate routes for landing (/), app (/app/*, /dashboard/*, etc.)
 
 ## Technologies
 ${techStack}
 
-## Sections de la Landing Page Intégrée
-1. **Hero Section**: Présentation du produit
-2. **Features**: Fonctionnalités principales
-3. **Benefits**: Avantages utilisateurs
-4. **CTA**: Boutons vers inscription/connexion
-5. **Footer**: Informations légales
+## Integrated Landing Page Sections
+1. **Hero Section**: Product presentation
+2. **Features**: Main features
+3. **Benefits**: User advantages
+4. **CTA**: Buttons to signup/login
+5. **Footer**: Legal information
 
-## Fonctionnalités de l'Application
+## Application Features
 ${this.getFeatures(projectData)}
 
-## Contraintes
+## Constraints
 ${this.getConstraints(projectData)}
 
 ## Instructions
-- Créez une application complète avec landing page intégrée
-- Utilisez un système de routing pour séparer landing et app
-- Assurez-vous d'une transition fluide entre landing et application
-- Implémentez l'authentification avec redirection appropriée
-- Optimisez pour SEO sur la landing page
-- Maintenez une cohérence de design entre landing et app
+- Create a complete application with integrated landing page
+- Use a routing system to separate landing and app
+- Ensure smooth transition between landing and application
+- Implement authentication with appropriate redirection
+- Optimize for SEO on the landing page
+- Maintain design consistency between landing and app
 
-Générez le code complet avec landing page intégrée et toutes les fonctionnalités.`;
+Generate the complete code with integrated landing page and all features.`;
+  }
+
+  /**
+   * Generate prompt for ONLY_LANDING config (landing page only)
+   */
+  private generateLandingOnlyPrompt(projectData: any): string {
+    const baseInfo = this.getBaseProjectInfo(projectData);
+    const techStack = this.getTechStackInfo(projectData);
+    
+    return `# Landing Page Generation Only
+
+${baseInfo}
+
+## Objective
+Create a standalone landing page for "${projectData.name}" without any application functionality.
+
+## Specifications
+- **Type**: Marketing landing page only
+- **Application**: None - pure landing page
+- **Focus**: Conversion, presentation, and marketing
+
+## Technologies
+${techStack}
+
+## Landing Page Sections
+1. **Hero Section**: Compelling headline, value proposition, primary CTA
+2. **Features**: Key product features and benefits
+3. **Social Proof**: Testimonials, reviews, client logos
+4. **Pricing**: Pricing plans and packages (if applicable)
+5. **About**: Company/product information
+6. **Contact**: Contact form and information
+7. **Footer**: Legal links, social media, additional info
+
+## Constraints
+${this.getConstraints(projectData)}
+
+## Instructions
+- Create a high-converting standalone landing page
+- Focus on marketing and conversion optimization
+- Implement modern design with smooth animations
+- Optimize for SEO and performance
+- Include clear call-to-action buttons
+- Make it fully responsive across all devices
+- No application functionality needed
+
+Generate the complete landing page code with all necessary files.`;
   }
 
   /**
@@ -151,128 +200,70 @@ Générez le code complet avec landing page intégrée et toutes les fonctionnal
     const baseInfo = this.getBaseProjectInfo(projectData);
     const techStack = this.getTechStackInfo(projectData);
     
-    return `# Génération d'Application Web
+    return `# Web Application Generation
 
 ${baseInfo}
 
-## Objectif
-Créer l'application web "${projectData.name}" sans landing page.
+## Objective
+Create the "${projectData.name}" web application without landing page.
 
-## Spécifications
-- **Type**: Application web pure
-- **Landing Page**: Aucune
-- **Focus**: Interface utilisateur et fonctionnalités métier uniquement
+## Specifications
+- **Type**: Pure web application
+- **Landing Page**: None
+- **Focus**: User interface and business features only
 
 ## Technologies
 ${techStack}
 
-## Fonctionnalités à Développer
+## Features to Develop
 ${this.getFeatures(projectData)}
 
-## Contraintes
+## Constraints
 ${this.getConstraints(projectData)}
 
 ## Instructions
-- Créez une application web complète et fonctionnelle
-- Commencez directement par l'interface d'authentification ou dashboard
-- Implémentez toutes les fonctionnalités métier requises
-- Assurez-vous d'une excellente UX/UI
-- Optimisez les performances et la sécurité
-- Incluez la gestion complète des utilisateurs
+- Create a complete and functional web application
+- Start directly with authentication interface or dashboard
+- Implement all required business features
+- Ensure excellent UX/UI
+- Optimize performance and security
+- Include complete user management
 
-Générez le code complet de l'application avec tous les fichiers nécessaires.`;
+Generate the complete application code with all necessary files.`;
   }
 
   /**
    * Get base project information
    */
   private getBaseProjectInfo(projectData: any): string {
-    return `## Informations du Projet
-- **Nom**: ${projectData.name}
-- **Description**: ${projectData.description || 'Aucune description fournie'}
+    return `## Project Information
+- **Name**: ${projectData.name}
+- **Description**: ${projectData.description || 'No description provided'}
 - **Type**: ${projectData.type || 'web'}
-- **Équipe**: ${projectData.teamSize || 'Non spécifié'}
-- **Portée**: ${projectData.scope || 'Non spécifiée'}`;
+- **Team**: ${projectData.teamSize || 'Not specified'}
+- **Scope**: ${projectData.scope || 'Not specified'}`;
   }
 
   /**
    * Get technology stack information
    */
   private getTechStackInfo(projectData: any): string {
-    const configs = projectData.analysisResultModel?.development?.configs;
-    if (!configs) return '- Technologies par défaut recommandées';
-
-    let techStack = '';
+    const techStack = projectData.analysisResultModel?.development?.configs?.techStack;
+    if (!techStack) return '- No technology specified';
     
-    if (configs.frontend) {
-      techStack += `- **Frontend**: ${configs.frontend.framework}`;
-      if (configs.frontend.frameworkVersion) {
-        techStack += ` v${configs.frontend.frameworkVersion}`;
-      }
-      techStack += `\n- **Styling**: ${Array.isArray(configs.frontend.styling) ? configs.frontend.styling.join(', ') : configs.frontend.styling}\n`;
-    }
-
-    if (configs.backend) {
-      techStack += `- **Backend**: ${configs.backend.framework}`;
-      if (configs.backend.frameworkVersion) {
-        techStack += ` v${configs.backend.frameworkVersion}`;
-      }
-      techStack += `\n- **API**: ${configs.backend.apiType}\n`;
-    }
-
-    if (configs.database) {
-      techStack += `- **Base de données**: ${configs.database.provider}`;
-      if (configs.database.version) {
-        techStack += ` v${configs.database.version}`;
-      }
-      techStack += '\n';
-    }
-
-    return techStack || '- Technologies par défaut recommandées';
+    return Object.entries(techStack)
+      .map(([key, value]) => `- **${key}**: ${value}`)
+      .join('\n');
   }
 
   /**
    * Get project features
    */
   private getFeatures(projectData: any): string {
-    const configs = projectData.analysisResultModel?.development?.configs;
-    if (!configs) return '- Fonctionnalités de base à implémenter';
-
-    let features = '';
+    const features = projectData.analysisResultModel?.development?.features;
+    if (!features || features.length === 0) return '- No features specified';
     
-    if (configs.projectConfig) {
-      const config = configs.projectConfig;
-      if (config.authentication) features += '- Authentification utilisateur\n';
-      if (config.authorization) features += '- Gestion des autorisations\n';
-      if (config.seoEnabled) features += '- Optimisation SEO\n';
-      if (config.contactFormEnabled) features += '- Formulaire de contact\n';
-      if (config.analyticsEnabled) features += '- Analytics intégrés\n';
-      if (config.i18nEnabled) features += '- Internationalisation\n';
-      if (config.performanceOptimized) features += '- Optimisation des performances\n';
-      if (config.paymentIntegration) features += '- Intégration de paiement\n';
-    }
-
-    // Add frontend features
-    if (configs.frontend?.features) {
-      const frontendFeatures = configs.frontend.features;
-      if (typeof frontendFeatures === 'object') {
-        if (frontendFeatures.routing) features += '- Système de routing\n';
-        if (frontendFeatures.componentLibrary) features += '- Bibliothèque de composants\n';
-        if (frontendFeatures.testing) features += '- Tests automatisés\n';
-        if (frontendFeatures.pwa) features += '- Progressive Web App\n';
-      }
-    }
-
-    // Add backend features
-    if (configs.backend?.features) {
-      const backendFeatures = configs.backend.features;
-      if (typeof backendFeatures === 'object') {
-        if (backendFeatures.documentation) features += '- Documentation API\n';
-        if (backendFeatures.logging) features += '- Système de logs\n';
-      }
-    }
-
-    return features || '- Fonctionnalités de base à implémenter';
+    return features.map((feature: any) => `- ${feature.name}: ${feature.description}`).join('\n');
   }
 
   /**
