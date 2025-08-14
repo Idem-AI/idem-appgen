@@ -1,55 +1,31 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Sidebar } from "../Sidebar";
-import { db } from "../../utils/indexDB";
-import { getCurrentUser } from "../../api/persistence/db";
-import type { UserModel } from "../../api/persistence/userModel";
+import { ProjectSidebar } from "../Sidebar/ProjectSidebar";
+import { getProjectById } from "../../api/persistence/db";
+import { useUrlData } from "../../hooks/useUrlData";
 import { useTranslation } from "react-i18next";
 
 export function ProjectTitle() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [chatCount, setChatCount] = useState(0);
   const timeoutRef = useRef<NodeJS.Timeout>();
-  const [user, setUser] = useState<UserModel | null>(null);
+  const [projectData, setProjectData] = useState<any>(null);
+  const { projectId } = useUrlData({ append: () => {} });
   const { t } = useTranslation();
-  const getInitials = (name: string) => {
-    return (
-      name
-        ?.split(" ")
-        .map((word) => word[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2) || "?"
-    );
-  };
 
-  // Get chat count
-  const loadChatCount = async () => {
-    const uuids = await db.getAllUuids();
-    setChatCount(uuids.length);
+  // Load project data
+  const loadProjectData = async () => {
+    if (!projectId) return;
+    
+    try {
+      const project = await getProjectById(projectId);
+      setProjectData(project);
+    } catch (error) {
+      console.error("Error loading project:", error);
+    }
   };
 
   useEffect(() => {
-    loadChatCount();
-    // Subscribe to database updates
-    const unsubscribe = db.subscribe(loadChatCount);
-    return () => {
-      unsubscribe();
-    };
-  }, []);
-
-  // Fetch user data
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const currentUser = await getCurrentUser();
-        setUser(currentUser);
-      } catch (error) {
-        console.error("Error fetching user:", error);
-      }
-    };
-
-    fetchUser();
-  }, []);
+    loadProjectData();
+  }, [projectId]);
 
   const handleMouseEnter = () => {
     if (timeoutRef.current) {
@@ -64,38 +40,60 @@ export function ProjectTitle() {
     }, 300);
   };
 
+  const handleSidebarMouseEnter = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+  };
+
+  const handleSidebarMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setIsSidebarOpen(false);
+    }, 300);
+  };
+
+  const closeSidebar = () => {
+    setIsSidebarOpen(false);
+  };
+
+  // Clean up timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
-    <div className="flex items-center gap-4">
+    <>
       <div
-        className="flex items-center gap-1.5 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-white/10 transition-colors group"
+        className="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 px-3 py-2 rounded-lg transition-colors"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <div
-          className={`
-          w-6 h-6 rounded-full
-          flex items-center justify-center
-          text-white text-xs font-medium
-          ${user?.photoURL ? "" : "bg-purple-500 dark:bg-purple-600"}
-        `}
-          style={
-            user?.photoURL
-              ? {
-                  backgroundImage: `url(${user.photoURL})`,
-                  backgroundSize: "cover",
-                }
-              : undefined
-          }
-        >
-          {!user?.photoURL &&
-            getInitials(user?.displayName || user?.email || "?")}
+        {/* Project Icon */}
+        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-medium">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
         </div>
-        <span className="text-gray-900 dark:text-white text-[14px] font-normal">
-          {user ? user.displayName || user.email : "Guest"}
-        </span>
 
+        {/* Project Info */}
+        <div className="flex-1 min-w-0">
+          <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
+            {projectData?.name || "Projet"}
+          </div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">
+            {projectId ? `ID: ${projectId.slice(0, 8)}...` : "Aucun projet"}
+          </div>
+        </div>
+
+        {/* Dropdown Arrow */}
         <svg
-          className="w-3.5 h-3.5 text-gray-400 transition-transform group-hover:text-gray-600 dark:group-hover:text-white"
+          className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
+            isSidebarOpen ? "rotate-180" : ""
+          }`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -104,35 +102,18 @@ export function ProjectTitle() {
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M9 5l7 7-7 7"
+            d="M19 9l-7 7-7-7"
           />
         </svg>
-
-        <div className="flex items-center gap-1 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-white">
-          <svg
-            className="w-3.5 h-3.5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-            />
-          </svg>
-          <span className="text-xs">{chatCount}</span>
-        </div>
       </div>
 
-      <Sidebar
+      {/* Project Sidebar */}
+      <ProjectSidebar
         isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        username={user?.displayName || user?.email || t("login.guest")}
+        onClose={closeSidebar}
+        onMouseEnter={handleSidebarMouseEnter}
+        onMouseLeave={handleSidebarMouseLeave}
       />
-    </div>
+    </>
   );
 }

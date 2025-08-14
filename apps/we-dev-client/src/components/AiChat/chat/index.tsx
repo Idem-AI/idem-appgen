@@ -21,7 +21,7 @@ import useChatModeStore from "../../../stores/chatModeSlice";
 import useTerminalStore from "@/stores/terminalSlice";
 import { checkExecList, checkFinish } from "../utils/checkFinish";
 import { useUrlData } from "@/hooks/useUrlData";
-import { getProjectById } from "@/api/persistence/db";
+import { getProjectById, getProjectGeneration, saveProjectGeneration, sendZipToBackend, sendToGitHub } from "@/api/persistence/db";
 import { WebGenService } from "./services/appGenService";
 import { MCPTool } from "@/types/mcp";
 import useMCPTools from "@/hooks/useMCPTools";
@@ -465,6 +465,23 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
         console.error("Failed to save chat history:", error);
       }
       setCheckCount((checkCount) => checkCount + 1);
+      
+      // Save generation data after completion
+      if (projectId && projectData) {
+        try {
+          await saveProjectGeneration(projectId, {
+            messages: [...messages, message],
+            files: files,
+            timestamp: Date.now(),
+            projectName: projectData.name
+          });
+          setIsGenerationComplete(true);
+          setShowGitHubButton(true);
+          console.log("Generation saved for project:", projectData.name);
+        } catch (error) {
+          console.error("Error saving generation:", error);
+        }
+      }
     },
     onError: (error: any) => {
       const msg = error?.errors?.[0]?.responseBody || String(error);
@@ -488,6 +505,9 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
   const [projectData, setProjectData] = useState(null);
   const [isProjectLoaded, setIsProjectLoaded] = useState(false);
   const [showStartButton, setShowStartButton] = useState(false);
+  const [hasGeneration, setHasGeneration] = useState(false);
+  const [isGenerationComplete, setIsGenerationComplete] = useState(false);
+  const [showGitHubButton, setShowGitHubButton] = useState(false);
 
   // Effet pour charger les données du projet si un projectId est présent dans l'URL
   // Mais ne lance pas automatiquement la génération
@@ -503,8 +523,18 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
         const project = await getProjectById(projectId);
         if (project) {
           setProjectData(project);
-          setShowStartButton(true);
-          console.log("Project data loaded:", project.name);
+          
+          // Check if generation already exists
+          const existingGeneration = await getProjectGeneration(projectId);
+          if (existingGeneration) {
+            setHasGeneration(true);
+            setIsGenerationComplete(true);
+            setShowGitHubButton(true);
+            console.log("Existing generation found for project:", project.name);
+          } else {
+            setShowStartButton(true);
+            console.log("No generation found, showing start button for:", project.name);
+          }
         } else {
           console.warn("Project not found with ID:", projectId);
           toast.error("Projet non trouvé");
@@ -536,10 +566,55 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
       });
 
       setShowStartButton(false);
+      setHasGeneration(true);
       console.log("Generation started for project:", projectData.name);
     } catch (error) {
       console.error("Error starting generation:", error);
       toast.error("Erreur lors du démarrage de la génération");
+    }
+  };
+
+  // Handle sending zip to backend
+  const handleSendZip = async () => {
+    if (!projectId || !files) return;
+    
+    try {
+      // Create zip from files
+      const JSZip = (await import('jszip')).default;
+      const zip = new JSZip();
+      
+      // Add files to zip
+      Object.entries(files).forEach(([filePath, content]) => {
+        zip.file(filePath, content);
+      });
+      
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      
+      await sendZipToBackend(projectId, zipBlob);
+      toast.success('Zip envoyé avec succès au backend!');
+    } catch (error) {
+      console.error('Error sending zip:', error);
+      toast.error('Erreur lors de l\'envoi du zip');
+    }
+  };
+
+  // Handle sending to GitHub
+  const handleSendToGitHub = async () => {
+    if (!projectId || !projectData) return;
+    
+    try {
+      const githubData = {
+        projectName: projectData.name,
+        description: projectData.description || 'Generated project',
+        files: files,
+        isPublic: true // You can make this configurable
+      };
+      
+      await sendToGitHub(projectId, githubData);
+      toast.success('Projet envoyé vers GitHub avec succès!');
+    } catch (error) {
+      console.error('Error sending to GitHub:', error);
+      toast.error('Erreur lors de l\'envoi vers GitHub');
     }
   };
 
@@ -870,7 +945,7 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
                     Projet: {projectData.name}
                   </h3>
                   <p className="text-blue-700 dark:text-blue-300 text-sm">
-                    Cliquez sur le bouton pour commencer la génération
+                    Aucune génération trouvée. Cliquez pour commencer.
                   </p>
                 </div>
                 <button
@@ -890,12 +965,37 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
                       d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h1m4 0h1m6-10V4a2 2 0 00-2-2H5a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2V4z"
                     />
                   </svg>
-                  Commencer la génération
+                  Générer maintenant
                 </button>
               </div>
             </div>
           </div>
         )}
+        
+        {/* Show existing generation status */}
+        {hasGeneration && !showStartButton && !isGenerationComplete && (
+          <div className="max-w-[640px] w-full mx-auto mb-4">
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 rounded-full bg-yellow-100 dark:bg-yellow-900/40 flex items-center justify-center">
+                  <svg className="w-4 h-4 text-yellow-600 dark:text-yellow-400 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-yellow-900 dark:text-yellow-100">
+                    Génération en cours
+                  </h3>
+                  <p className="text-xs text-yellow-700 dark:text-yellow-300">
+                    Projet: {projectData?.name}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
         <Tips
           append={append}
           setInput={setInput}
@@ -962,11 +1062,59 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
               </div>
             </div>
           )}
+
+          {/* Generation Complete Actions */}
+          {isGenerationComplete && showGitHubButton && (
+            <div className="max-w-[640px] w-full mx-auto mt-4">
+              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
+                      <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-green-900 dark:text-green-100">
+                        Génération terminée
+                      </h3>
+                      <p className="text-xs text-green-700 dark:text-green-300">
+                        Votre projet est prêt à être exporté
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={handleSendZip}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                    </svg>
+                    Envoyer ZIP
+                  </button>
+                  
+                  <button
+                    onClick={handleSendToGitHub}
+                    className="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    Envoyer vers GitHub
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+          
           <div ref={messagesEndRef} className="h-px" />
         </div>
       </div>
     );
-  }, [messages, isLoading, setInput, handleFileSelect]);
+  }, [messages, isLoading, setInput, handleFileSelect, showStartButton, hasGeneration, isGenerationComplete, showGitHubButton, projectData]);
 
   // show guide modal
   const showGuide = () => setVisible(true);
