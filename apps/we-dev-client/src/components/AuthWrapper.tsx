@@ -29,7 +29,8 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
   useEffect(() => {
     // Redirect to login if not authenticated
     if (isAuthenticated === false) {
-      window.location.href = "http://localhost:4200/login";
+      console.log("Redirecting to login");
+      // window.location.href = "http://localhost:4200/login";
     }
   }, [isAuthenticated]);
 

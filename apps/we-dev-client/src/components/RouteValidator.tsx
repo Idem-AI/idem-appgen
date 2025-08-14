@@ -20,14 +20,14 @@ const RouteValidator: React.FC<RouteValidatorProps> = ({ children }) => {
         
         if (!projectIdFromUrl) {
           console.warn('No projectId found in URL. Redirecting to login.');
-          window.location.href = 'http://localhost:4200/login';
+          // window.location.href = 'http://localhost:4200/login';
           return;
         }
         
         setIsValidRoute(true);
       } catch (error) {
         console.error('Route validation failed:', error);
-        window.location.href = 'http://localhost:4200/login';
+        // window.location.href = 'http://localhost:4200/login';
       } finally {
         setIsLoading(false);
       }

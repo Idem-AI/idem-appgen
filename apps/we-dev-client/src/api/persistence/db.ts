@@ -70,3 +70,23 @@ export async function getProjectById(
     throw error;
   }
 }
+
+export async function getUserProjects(): Promise<ProjectModel[] | null> {
+  try {
+    await checkAuth();
+
+    const response = await fetch(`${API_BASE_URL}/projects`, {
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      console.error("Error getting projects from API:", response.statusText);
+      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    }
+
+    return (await response.json()) as ProjectModel[];
+  } catch (error) {
+    console.error("Error getting projects:", error);
+    throw error;
+  }
+}

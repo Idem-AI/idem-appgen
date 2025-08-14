@@ -1,50 +1,62 @@
+import useUserStore from "./stores/userSlice";
+import useChatModeStore from "./stores/chatModeSlice";
+import { GlobalLimitModal } from "./components/UserModal";
+import Header from "./components/Header";
 import AiChat from "./components/AiChat";
+import EditorPreviewTabs from "./components/EditorPreviewTabs";
 import "./utils/i18";
 import classNames from "classnames";
-import {ToastContainer} from "react-toastify";
+import { ChatMode } from "./types/chat";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { UpdateTip } from "./components/UpdateTip";
 import useInit from "./hooks/useInit";
-import {Loading} from "./components/loading";
-import AuthWrapper from "./components/AuthWrapper";
-import RouteValidator from "./components/RouteValidator";
+import { Loading } from "./components/loading";
+import TopViewContainer from "./components/TopView";
 
 function App() {
-    const {isDarkMode} = useInit();
+  const { mode, initOpen } = useChatModeStore();
 
-    return (
-        <AuthWrapper>
-            <RouteValidator>
-                <div
-                    className={classNames(
-                        "h-screen w-screen flex flex-col overflow-hidden",
-                        {
-                            dark: isDarkMode,
-                        }
-                    )}
-                >
-                    <div className="flex flex-row w-full h-full bg-white dark:bg-[#111]">
-                        <AiChat/>
-                    </div>
-                </div>
-                <ToastContainer
-                    position="top-center"
-                    autoClose={2000}
-                    hideProgressBar={false}
-                    newestOnTop={false}
-                    closeOnClick
-                    rtl={false}
-                    pauseOnFocusLoss
-                    draggable
-                    pauseOnHover
-                    theme="colored"
-                    style={{
-                        zIndex: 100000,
-                    }}
-                />
-                <Loading/>
-            </RouteValidator>
-        </AuthWrapper>
-    );
+  const { openLoginModal } = useUserStore();
+
+  const { isDarkMode } = useInit();
+
+  return (
+    <TopViewContainer>
+      <GlobalLimitModal onLogin={openLoginModal} />
+      <div
+        className={classNames(
+          "h-screen w-screen flex flex-col overflow-hidden",
+          {
+            dark: isDarkMode,
+          }
+        )}
+      >
+        <Header />
+        <div className="flex flex-row w-full h-full max-h-[calc(100%-48px)] bg-white dark:bg-[#111]">
+          <AiChat />
+          {mode === ChatMode.Builder && !initOpen && <EditorPreviewTabs />}
+        </div>
+      </div>
+      <UpdateTip />
+      <ToastContainer
+        position="top-center"
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        style={{
+          zIndex: 100000,
+        }}
+      />
+      <Loading />
+    </TopViewContainer>
+  );
 }
 
 export default App;
