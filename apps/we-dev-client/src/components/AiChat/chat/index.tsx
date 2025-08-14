@@ -22,9 +22,9 @@ import useTerminalStore from "@/stores/terminalSlice";
 import { checkExecList, checkFinish } from "../utils/checkFinish";
 import { useUrlData } from "@/hooks/useUrlData";
 import { getProjectById, getProjectGeneration, saveProjectGeneration, sendZipToBackend, sendToGitHub } from "@/api/persistence/db";
-import { WebGenService } from "./services/appGenService";
 import { MCPTool } from "@/types/mcp";
 import useMCPTools from "@/hooks/useMCPTools";
+import { MultiChatPromptService } from "./services/multiChatPromptService";
 
 type WeMessages = (Message & {
   experimental_attachments?: Array<{
@@ -555,8 +555,8 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
     if (!projectData) return;
 
     try {
-      const webGenService = new WebGenService();
-      const projectPrompt = webGenService.generateWebsitePrompt(projectData);
+      const webGenService = new MultiChatPromptService();
+      const projectPrompt = webGenService.generatePrompt(projectData);
 
       // Envoyer le prompt formaté au chat
       append({
