@@ -152,7 +152,7 @@ export function HeaderActions() {
             method: "POST",
             body: formData,
           });
-          const data = await response.json(); 
+          const data = await response.json();
 
           if (data.success) {
             setDeployUrl(data.url);
@@ -337,16 +337,59 @@ export function HeaderActions() {
         </Modal>
       )}
 
+      {/* Deploy Loading Modal */}
+      {isDeploying && (
+        <Modal
+          open={isDeploying}
+          footer={null}
+          closable={false}
+          centered
+          width={400}
+          className="deploy-loading-modal"
+          styles={{
+            content: { backgroundColor: "var(--color-bg-light)" },
+
+            body: {
+              padding: "2rem",
+            },
+            header: {
+              display: "none",
+            },
+          }}
+        >
+          <div className="text-center">
+            <h3 className="text-lg font-semibold text-white mb-4">
+              Deploying Your Project
+            </h3>
+            <div className="flex justify-center items-center h-32">
+              <div className="relative">
+                <div className="animate-spin rounded-full h-16 w-16 border-2 border-blue-500/30 border-t-blue-500"></div>
+                <div className="absolute inset-0 rounded-full animate-pulse bg-blue-500/10 backdrop-blur-sm"></div>
+              </div>
+            </div>
+            <p className="text-sm text-gray-400 mt-4">
+              Please wait while we deploy your application...
+            </p>
+          </div>
+        </Modal>
+      )}
+
       {/* Deploy Choice Modal */}
       {showDeployChoiceModal && (
         <Modal
           open={showDeployChoiceModal}
           onCancel={() => setShowDeployChoiceModal(false)}
           footer={null}
-          centered
+          width={600}
+          className=" bg-black"
           styles={{
             content: { backgroundColor: "var(--color-bg-light)" },
-            header: { backgroundColor: "var(--color-bg-light)" },
+            body: {
+              padding: 0,
+            },
+            header: {
+              display: "none",
+            },
           }}
         >
           <div className="text-center mb-6">
@@ -365,10 +408,10 @@ export function HeaderActions() {
                 />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <h3 className="text-2xl font-bold text-white mb-2">
               Deploy Your Project
             </h3>
-            <p className="text-gray-600 dark:text-gray-300 text-sm">
+            <p className="text-gray-300 text-sm">
               Choose how you want to deploy your application
             </p>
           </div>
@@ -377,7 +420,7 @@ export function HeaderActions() {
             {/* Idem Option - Custom Deployment */}
             <button
               onClick={() => handleDeployChoice("idem")}
-              className="group relative overflow-hidden rounded-2xl border-2 border-transparent bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-800 dark:via-gray-750 dark:to-gray-700 p-6 text-left transition-all duration-300 hover:border-blue-300 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+              className="group relative overflow-hidden rounded-2xl  bg-gradient-to-br from-gray-800 via-gray-750 to-gray-700 p-6 text-left transition-all duration-300 hover:border-blue-300 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
             >
               <div className="relative z-10">
                 <div className="flex items-center gap-3 mb-4">
@@ -385,31 +428,31 @@ export function HeaderActions() {
                     <img src="public/assets/icons/idem.png" alt="Netlify" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    <h4 className="font-bold text-lg text-white group-hover:text-blue-400 transition-colors">
                       Idem
                     </h4>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide font-medium">
+                    <p className="text-xs text-gray-400 uppercase tracking-wide font-medium">
                       Custom Deployment
                     </p>
                   </div>
                 </div>
 
-                <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
+                <p className="text-sm text-gray-300 mb-4 leading-relaxed">
                   Deploy to any cloud provider, your own server, or
                   infrastructure of choice
                 </p>
 
                 <div className="flex flex-wrap gap-1.5">
-                  <span className="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-md font-medium">
+                  <span className="px-2 py-1 text-xs bg-blue-900/50 text-blue-300 rounded-md font-medium">
                     AWS
                   </span>
-                  <span className="px-2 py-1 text-xs bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 rounded-md font-medium">
+                  <span className="px-2 py-1 text-xs bg-indigo-900/50 text-indigo-300 rounded-md font-medium">
                     Docker
                   </span>
-                  <span className="px-2 py-1 text-xs bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 rounded-md font-medium">
+                  <span className="px-2 py-1 text-xs bg-purple-900/50 text-purple-300 rounded-md font-medium">
                     K8s
                   </span>
-                  <span className="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-md font-medium">
+                  <span className="px-2 py-1 text-xs bg-blue-900/50 text-blue-300 rounded-md font-medium">
                     Terraform
                   </span>
                 </div>
@@ -422,7 +465,7 @@ export function HeaderActions() {
             {/* Netlify Option - Quick Deployment */}
             <button
               onClick={() => handleDeployChoice("netlify")}
-              className="group relative overflow-hidden rounded-2xl border-2 border-transparent bg-gradient-to-br from-teal-50 via-cyan-50 to-emerald-50 dark:from-gray-800 dark:via-gray-750 dark:to-gray-700 p-6 text-left transition-all duration-300 hover:border-teal-300 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+              className="group relative overflow-hidden rounded-2xl  bg-gradient-to-br from-gray-800 via-gray-750 to-gray-700 p-6 text-left transition-all duration-300 hover:border-teal-300 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
             >
               <div className="relative z-10">
                 <div className="flex items-center gap-3 mb-4">
@@ -430,27 +473,27 @@ export function HeaderActions() {
                     <img src="public/assets/icons/netlify.svg" alt="Netlify" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                    <h4 className="font-bold text-lg text-white group-hover:text-teal-400 transition-colors">
                       Netlify
                     </h4>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide font-medium">
+                    <p className="text-xs text-gray-400 uppercase tracking-wide font-medium">
                       Quick Deploy
                     </p>
                   </div>
                 </div>
 
-                <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
+                <p className="text-sm text-gray-300 mb-4 leading-relaxed">
                   Instant deployment with global CDN and automatic builds
                 </p>
 
                 <div className="flex flex-wrap gap-1.5">
-                  <span className="px-2 py-1 text-xs bg-teal-100 dark:bg-teal-900/50 text-teal-700 dark:text-teal-300 rounded-md font-medium">
+                  <span className="px-2 py-1 text-xs bg-teal-900/50 text-teal-300 rounded-md font-medium">
                     One-click
                   </span>
-                  <span className="px-2 py-1 text-xs bg-cyan-100 dark:bg-cyan-900/50 text-cyan-700 dark:text-cyan-300 rounded-md font-medium">
+                  <span className="px-2 py-1 text-xs bg-cyan-900/50 text-cyan-300 rounded-md font-medium">
                     Global CDN
                   </span>
-                  <span className="px-2 py-1 text-xs bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 rounded-md font-medium">
+                  <span className="px-2 py-1 text-xs bg-emerald-900/50 text-emerald-300 rounded-md font-medium">
                     Auto SSL
                   </span>
                 </div>
@@ -464,7 +507,7 @@ export function HeaderActions() {
           <div className="flex justify-center">
             <button
               onClick={() => setShowDeployChoiceModal(false)}
-              className="px-6 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors font-medium"
+              className="px-6 py-2 text-gray-400 hover:text-gray-200 transition-colors font-medium"
             >
               Cancel
             </button>
