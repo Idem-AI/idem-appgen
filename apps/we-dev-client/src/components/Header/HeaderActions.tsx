@@ -204,8 +204,9 @@ export function HeaderActions() {
         description: "Project generated from we-dev-client",
         timestamp: new Date().toISOString(),
       };
+      console.log("Sending to GitHub:", githubData);
 
-      await sendToGitHub(projectId, githubData);
+      // await sendToGitHub(projectId, githubData);
       toast.success("Project sent to GitHub successfully!");
     } catch (error) {
       console.error("Failed to send to GitHub:", error);

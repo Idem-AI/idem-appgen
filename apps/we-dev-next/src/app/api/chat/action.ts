@@ -11,7 +11,7 @@ import { modelConfig } from "../model/config";
 import { createDeepSeek } from "@ai-sdk/deepseek";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 
-export const MAX_TOKENS = 16000;
+export const MAX_TOKENS = 59000;
 
 export type StreamingOptions = Omit<Parameters<typeof _streamText>[0], "model">;
 let initOptions = {};
@@ -99,7 +99,6 @@ export function streamTextFn(
   return _streamText({
     model: model || defaultModel,
     messages: convertToCoreMessages(newMessages),
-    maxTokens: MAX_TOKENS,
     ...initOptions,
     ...options,
   });
