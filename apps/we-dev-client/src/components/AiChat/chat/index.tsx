@@ -21,7 +21,13 @@ import useChatModeStore from "../../../stores/chatModeSlice";
 import useTerminalStore from "@/stores/terminalSlice";
 import { checkExecList, checkFinish } from "../utils/checkFinish";
 import { useUrlData } from "@/hooks/useUrlData";
-import { getProjectById, getProjectGeneration, saveProjectGeneration, sendZipToBackend, sendToGitHub } from "@/api/persistence/db";
+import {
+  getProjectById,
+  getProjectGeneration,
+  saveProjectGeneration,
+  sendZipToBackend,
+  sendToGitHub,
+} from "@/api/persistence/db";
 import { MCPTool } from "@/types/mcp";
 import useMCPTools from "@/hooks/useMCPTools";
 import { MultiChatPromptService } from "./services/multiChatPromptService";
@@ -466,7 +472,7 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
         console.error("Failed to save chat history:", error);
       }
       setCheckCount((checkCount) => checkCount + 1);
-      
+
       // Save generation data after completion
       if (projectId && projectData) {
         try {
@@ -474,7 +480,7 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
             messages: [...messages, message],
             files: files,
             timestamp: Date.now(),
-            projectName: projectData.name
+            projectName: projectData.name,
           });
           setIsGenerationComplete(true);
           setShowGitHubButton(true);
@@ -525,7 +531,7 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
         const project = await getProjectById(projectId);
         if (project) {
           setProjectData(project);
-          
+
           // Check if generation already exists
           const existingGeneration = await getProjectGeneration(projectId);
           if (existingGeneration) {
@@ -535,7 +541,10 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
             console.log("Existing generation found for project:", project.name);
           } else {
             setShowStartButton(true);
-            console.log("No generation found, showing start button for:", project.name);
+            console.log(
+              "No generation found, showing start button for:",
+              project.name
+            );
           }
         } else {
           console.warn("Project not found with ID:", projectId);
@@ -546,9 +555,12 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
         toast.error("Error loading project data");
       } finally {
         setIsProjectLoaded(true);
-        
+
         // Check if tutorial should be shown
-        if (projectId && !localStorage.getItem(`tutorial_completed_${projectId}`)) {
+        if (
+          projectId &&
+          !localStorage.getItem(`tutorial_completed_${projectId}`)
+        ) {
           setShowTutorial(true);
         }
       }
@@ -584,23 +596,23 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
   // Handle sending zip to backend
   const handleSendZip = async () => {
     if (!projectId || !files) return;
-    
+
     try {
       // Create zip from files
-      const JSZip = (await import('jszip')).default;
+      const JSZip = (await import("jszip")).default;
       const zip = new JSZip();
-      
+
       // Add files to zip
       Object.entries(files).forEach(([filePath, content]) => {
         zip.file(filePath, content);
       });
-      
-      const zipBlob = await zip.generateAsync({ type: 'blob' });
-      
+
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+
       await sendZipToBackend(projectId, zipBlob);
-      toast.success('Generation saved successfully!');
+      toast.success("Generation saved successfully!");
     } catch (error) {
-      console.error('Error sending zip:', error);
+      console.error("Error sending zip:", error);
       toast.error("Error saving generation");
     }
   };
@@ -608,19 +620,19 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
   // Handle sending to GitHub
   const handleSendToGitHub = async () => {
     if (!projectId || !projectData) return;
-    
+
     try {
       const githubData = {
         projectName: projectData.name,
-        description: projectData.description || 'Generated project',
+        description: projectData.description || "Generated project",
         files: files,
-        isPublic: true // You can make this configurable
+        isPublic: true, // You can make this configurable
       };
-      
+
       await sendToGitHub(projectId, githubData);
       toast.success("Project sent to GitHub successfully!");
     } catch (error) {
-      console.error('Error sending to GitHub:', error);
+      console.error("Error sending to GitHub:", error);
       toast.error("Error sending to GitHub");
     }
   };
@@ -931,7 +943,7 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
       }
     } catch (error) {
       console.error("Failed to process dropped images:", error);
-      toast.error("添加图片失败");
+      toast.error("Failed to process dropped images");
     } finally {
       setIsUploading(false);
     }
@@ -949,29 +961,51 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
             <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
               <div className="text-center mb-4">
                 <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  <svg
+                    className="w-8 h-8 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                    />
                   </svg>
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                   {projectData.name}
                 </h2>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  {projectData.description || "Ready to generate your application"}
+                  {projectData.description ||
+                    "Ready to generate your application"}
                 </p>
               </div>
-              
+
               {showStartButton ? (
                 <div className="text-center">
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                    Click the button below to start generating your application code
+                    Click the button below to start generating your application
+                    code
                   </p>
                   <button
                     onClick={handleStartGeneration}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-200 flex items-center gap-3 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105"
+                    className="bg-primary hover:bg-primary/80 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-200 flex items-center gap-3 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105"
                   >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    <svg
+                      className="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 10V3L4 14h7v7l9-11h-7z"
+                      />
                     </svg>
                     Generate Now
                   </button>
@@ -980,9 +1014,24 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
                 <div className="text-center">
                   <div className="flex items-center justify-center space-x-3 mb-2">
                     <div className="w-6 h-6 rounded-full bg-yellow-100 dark:bg-yellow-900/40 flex items-center justify-center">
-                      <svg className="w-4 h-4 text-yellow-600 dark:text-yellow-400 animate-spin" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <svg
+                        className="w-4 h-4 text-yellow-600 dark:text-yellow-400 animate-spin"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
                       </svg>
                     </div>
                     <h3 className="text-lg font-semibold text-yellow-900 dark:text-yellow-100">
@@ -997,8 +1046,18 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
                 <div className="text-center">
                   <div className="flex items-center justify-center space-x-3 mb-4">
                     <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
-                      <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      <svg
+                        className="w-4 h-4 text-green-600 dark:text-green-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
                     </div>
                     <h3 className="text-lg font-semibold text-green-900 dark:text-green-100">
@@ -1006,14 +1065,15 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
                     </h3>
                   </div>
                   <p className="text-sm text-green-700 dark:text-green-300 mb-4">
-                    Your application has been successfully generated and is ready for export.
+                    Your application has been successfully generated and is
+                    ready for export.
                   </p>
                 </div>
               ) : null}
             </div>
           </div>
         )}
-        
+
         {/* Only show tips if no project data */}
         {!projectData && (
           <Tips
@@ -1096,47 +1156,75 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
                     Choose how you'd like to export your generated code
                   </p>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <button
                     onClick={handleSendZip}
                     className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl font-medium transition-all duration-200 flex items-center gap-3 group hover:shadow-lg"
                   >
                     <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center group-hover:bg-blue-400 transition-colors">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
+                        />
                       </svg>
                     </div>
                     <div className="text-left">
                       <div className="font-semibold">Download ZIP</div>
-                      <div className="text-xs text-blue-200">Get all files as archive</div>
+                      <div className="text-xs text-blue-200">
+                        Get all files as archive
+                      </div>
                     </div>
                   </button>
-                  
+
                   <button
                     onClick={handleSendToGitHub}
                     className="bg-gray-900 hover:bg-gray-800 text-white p-4 rounded-xl font-medium transition-all duration-200 flex items-center gap-3 group hover:shadow-lg"
                   >
                     <div className="w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center group-hover:bg-gray-600 transition-colors">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                      <svg
+                        className="w-5 h-5"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
                       </svg>
                     </div>
                     <div className="text-left">
                       <div className="font-semibold">Push to GitHub</div>
-                      <div className="text-xs text-gray-400">Create repository</div>
+                      <div className="text-xs text-gray-400">
+                        Create repository
+                      </div>
                     </div>
                   </button>
                 </div>
               </div>
             </div>
           )}
-          
+
           <div ref={messagesEndRef} className="h-px" />
         </div>
       </div>
     );
-  }, [messages, isLoading, setInput, handleFileSelect, showStartButton, hasGeneration, isGenerationComplete, showGitHubButton, projectData]);
+  }, [
+    messages,
+    isLoading,
+    setInput,
+    handleFileSelect,
+    showStartButton,
+    hasGeneration,
+    isGenerationComplete,
+    showGitHubButton,
+    projectData,
+  ]);
 
   // show guide modal
   const showGuide = () => setVisible(true);
@@ -1155,7 +1243,7 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
       onDrop={handleDrop}
     >
       {showJsx}
-      
+
       {/* Tutorial Modal */}
       {showTutorial && projectData && (
         <ProjectTutorial
@@ -1163,7 +1251,7 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
           onClose={() => setShowTutorial(false)}
         />
       )}
-      
+
       <ChatInput
         input={input}
         setMessages={setMessages}
