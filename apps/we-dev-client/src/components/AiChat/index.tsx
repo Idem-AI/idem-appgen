@@ -18,7 +18,7 @@ const Independent: React.FC = () => {
           initOpen ? 'flex items-center justify-center' : ''
         }`}
         style={{
-          width: `${mode === ChatMode.Builder && !initOpen ? "300px" : "100%"}`,
+          width: `${mode === ChatMode.Builder && !initOpen ? "400px" : "100%"}`,
         }}
       >
         <BaseChat />

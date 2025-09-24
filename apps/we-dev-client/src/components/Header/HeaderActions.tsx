@@ -9,6 +9,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { Modal } from "antd";
 import { sendToGitHub } from "@/api/persistence/db";
+import { HelpButton } from "./HelpButton";
 
 // Add a helper function to recursively get all files
 const getAllFiles = async (
@@ -218,6 +219,7 @@ export function HeaderActions() {
 
   return (
     <div className="flex items-center gap-2">
+      <HelpButton />
       {mode === ChatMode.Builder && (
         <div className="flex items-center gap-2">
           <button
@@ -322,7 +324,7 @@ export function HeaderActions() {
             <span>{isSendingToGitHub ? "Sending..." : "Send to GitHub"}</span>
           </button>
 
-          {/* Option pour ouvrir un répertoire désactivée en mode web */}
+          {/* Directory opening option disabled in web mode */}
         </div>
       )}
       {showModal && (
