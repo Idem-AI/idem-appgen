@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useUrlData } from "../../hooks/useUrlData";
+import { ProjectModel } from "@/api/persistence/models/project.model";
 
 interface ProjectTutorialProps {
-  projectData: any;
+  projectData: ProjectModel;
   onClose: () => void;
 }
 
