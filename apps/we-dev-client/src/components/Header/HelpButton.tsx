@@ -3,10 +3,11 @@ import { ProjectTutorial } from "../Onboarding/ProjectTutorial";
 import { useUrlData } from "../../hooks/useUrlData";
 import { getProjectById } from "../../api/persistence/db";
 import { Modal } from "antd";
+import { ProjectModel } from "@/api/persistence/models/project.model";
 
 export function HelpButton() {
   const [showTutorial, setShowTutorial] = useState(false);
-  const [projectData, setProjectData] = useState<any>(null);
+  const [projectData, setProjectData] = useState<ProjectModel | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { projectId } = useUrlData({ append: () => {} });
 
