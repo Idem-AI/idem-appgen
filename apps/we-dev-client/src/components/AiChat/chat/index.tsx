@@ -33,6 +33,7 @@ import useMCPTools from "@/hooks/useMCPTools";
 import { MultiChatPromptService } from "./services/multiChatPromptService";
 import { ProjectTutorial } from "../../Onboarding/ProjectTutorial";
 import { useLoading } from "../../loading";
+import { ProjectModel } from "@/api/persistence/models/project.model";
 
 type WeMessages = (Message & {
   experimental_attachments?: Array<{
@@ -510,7 +511,7 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
     },
   });
   const { status, type, projectId } = useUrlData({ append });
-  const [projectData, setProjectData] = useState(null);
+  const [projectData, setProjectData] = useState<ProjectModel | null>(null);
   const [isProjectLoaded, setIsProjectLoaded] = useState(false);
   const [showStartButton, setShowStartButton] = useState(false);
   const [hasGeneration, setHasGeneration] = useState(false);
@@ -519,6 +520,28 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
   const [showTutorial, setShowTutorial] = useState(false);
   const [projectLoadError, setProjectLoadError] = useState<string | null>(null);
   const { setLoading } = useLoading();
+
+  // Extract project colors for theming
+  const projectColors = useMemo(() => {
+    const colors = projectData?.analysisResultModel?.branding?.colors?.colors;
+    if (colors) {
+      return {
+        primary: colors.primary || "#3B82F6",
+        secondary: colors.secondary || "#8B5CF6",
+        accent: colors.accent || "#10B981",
+        background: colors.background || "#F3F4F6",
+        text: colors.text || "#1F2937",
+      };
+    }
+    // Fallback colors
+    return {
+      primary: "#3B82F6",
+      secondary: "#8B5CF6",
+      accent: "#10B981",
+      background: "#F3F4F6",
+      text: "#1F2937",
+    };
+  }, [projectData]);
 
   // Load project data when projectId is present in URL
   // Does not automatically start generation
@@ -554,11 +577,15 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
           }
         } else {
           console.warn("Project not found with ID:", projectId);
-          setProjectLoadError("Project not found. Please check the project ID and try again.");
+          setProjectLoadError(
+            "Project not found. Please check the project ID and try again."
+          );
         }
       } catch (error) {
         console.error("Error loading project data:", error);
-        setProjectLoadError("Failed to load project data. Please check your connection and try again.");
+        setProjectLoadError(
+          "Failed to load project data. Please check your connection and try again."
+        );
       } finally {
         setLoading(false);
         setIsProjectLoaded(true);
@@ -971,8 +998,18 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
           <div className="max-w-md w-full text-center">
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6">
               <div className="w-16 h-16 bg-red-100 dark:bg-red-900/40 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                <svg
+                  className="w-8 h-8 text-red-600 dark:text-red-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                  />
                 </svg>
               </div>
               <h3 className="text-lg font-semibold text-red-900 dark:text-red-100 mb-2">
@@ -985,8 +1022,18 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
                 onClick={retryLoadProject}
                 className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2 mx-auto"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
                 </svg>
                 Try Again
               </button>
@@ -1004,32 +1051,55 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
         {/* Project Generation Workspace Header */}
         {projectData && (
           <div className="max-w-[640px] w-full mx-auto mb-6">
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
+            <div
+              className="rounded-xl p-6"
+              style={{
+                background: `linear-gradient(135deg, ${projectColors.primary}15 0%, ${projectColors.secondary}15 100%)`,
+                border: `1px solid ${projectColors.primary}30`,
+              }}
+            >
               <div className="text-center mb-4">
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <svg
-                    className="w-8 h-8 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 bg-zinc-100">
+                  {projectData.analysisResultModel?.branding?.logo?.variations
+                    ?.iconOnly?.lightBackground ? (
+                    <img
+                      src={
+                        projectData.analysisResultModel.branding.logo.variations
+                          .iconOnly.lightBackground
+                      }
+                      alt="Project Logo"
+                      className="w-10 h-10 rounded-full"
                     />
-                  </svg>
+                  ) : (
+                    <svg
+                      className="w-8 h-8 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 10V3L4 14h7v7l9-11h-7z"
+                      />
+                    </svg>
+                  )}
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                <h2
+                  className="text-2xl font-bold mb-2"
+                  style={{ color: projectColors.primary }}
+                >
                   {projectData.name}
                 </h2>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                <p
+                  className="mb-4"
+                  style={{ color: `${projectColors.text}CC` }}
+                >
                   {projectData.description ||
                     "Ready to generate your application"}
                 </p>
               </div>
-
               {showStartButton ? (
                 <div className="text-center">
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -1038,7 +1108,10 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
                   </p>
                   <button
                     onClick={handleStartGeneration}
-                    className="bg-primary hover:bg-primary/80 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-200 flex items-center gap-3 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105"
+                    className="text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-200 flex items-center gap-3 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105 hover:opacity-90"
+                    style={{
+                      background: `linear-gradient(135deg, ${projectColors.primary} 0%, ${projectColors.secondary} 100%)`,
+                    }}
                   >
                     <svg
                       className="w-6 h-6"
@@ -1059,11 +1132,15 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
               ) : hasGeneration && !isGenerationComplete ? (
                 <div className="text-center">
                   <div className="flex items-center justify-center space-x-3 mb-2">
-                    <div className="w-6 h-6 rounded-full bg-yellow-100 dark:bg-yellow-900/40 flex items-center justify-center">
+                    <div
+                      className="w-6 h-6 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: `${projectColors.accent}20` }}
+                    >
                       <svg
-                        className="w-4 h-4 text-yellow-600 dark:text-yellow-400 animate-spin"
+                        className="w-4 h-4 animate-spin"
                         fill="none"
                         viewBox="0 0 24 24"
+                        style={{ color: projectColors.accent }}
                       >
                         <circle
                           className="opacity-25"
@@ -1080,22 +1157,31 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
                         ></path>
                       </svg>
                     </div>
-                    <h3 className="text-lg font-semibold text-yellow-900 dark:text-yellow-100">
+                    <h3
+                      className="text-lg font-semibold"
+                      style={{ color: projectColors.accent }}
+                    >
                       Generation in Progress
                     </h3>
                   </div>
-                  <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                  <p
+                    className="text-sm"
+                    style={{ color: `${projectColors.accent}CC` }}
+                  >
                     Your application is being generated. Please wait...
                   </p>
                 </div>
               ) : isGenerationComplete ? (
                 <div className="text-center">
                   <div className="flex items-center justify-center space-x-3 mb-4">
-                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
+                    <div
+                      className="w-6 h-6 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: `${projectColors.accent}20` }}
+                    >
                       <svg
-                        className="w-4 h-4 text-green-600 dark:text-green-400"
+                        className="w-4 h-4"
                         fill="none"
-                        stroke="currentColor"
+                        stroke={projectColors.accent}
                         viewBox="0 0 24 24"
                       >
                         <path
@@ -1106,11 +1192,17 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
                         />
                       </svg>
                     </div>
-                    <h3 className="text-lg font-semibold text-green-900 dark:text-green-100">
+                    <h3
+                      className="text-lg font-semibold"
+                      style={{ color: projectColors.accent }}
+                    >
                       Generation Complete
                     </h3>
                   </div>
-                  <p className="text-sm text-green-700 dark:text-green-300 mb-4">
+                  <p
+                    className="text-sm mb-4"
+                    style={{ color: `${projectColors.accent}CC` }}
+                  >
                     Your application has been successfully generated and is
                     ready for export.
                   </p>
@@ -1193,12 +1285,24 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
           {/* Export Actions */}
           {isGenerationComplete && showGitHubButton && (
             <div className="max-w-[640px] w-full mx-auto mt-6">
-              <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border border-green-200 dark:border-green-800 rounded-xl p-6">
+              <div
+                className="rounded-xl p-6"
+                style={{
+                  background: `linear-gradient(135deg, ${projectColors.accent}15 0%, ${projectColors.primary}15 100%)`,
+                  border: `1px solid ${projectColors.accent}30`,
+                }}
+              >
                 <div className="text-center mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3
+                    className="text-lg font-semibold mb-2"
+                    style={{ color: projectColors.primary }}
+                  >
                     Export Your Application
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p
+                    className="text-sm"
+                    style={{ color: `${projectColors.text}CC` }}
+                  >
                     Choose how you'd like to export your generated code
                   </p>
                 </div>
@@ -1206,13 +1310,19 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <button
                     onClick={handleSendZip}
-                    className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl font-medium transition-all duration-200 flex items-center gap-3 group hover:shadow-lg"
+                    className="text-white p-4 rounded-xl font-medium transition-all duration-200 flex items-center gap-3 group hover:shadow-lg hover:opacity-90"
+                    style={{
+                      background: `linear-gradient(135deg, ${projectColors.primary} 0%, ${projectColors.secondary} 100%)`,
+                    }}
                   >
-                    <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center group-hover:bg-blue-400 transition-colors">
+                    <div
+                      className="w-10 h-10 rounded-lg flex items-center justify-center transition-colors"
+                      style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }}
+                    >
                       <svg
                         className="w-5 h-5"
                         fill="none"
-                        stroke="currentColor"
+                        stroke="white"
                         viewBox="0 0 24 24"
                       >
                         <path
@@ -1225,7 +1335,10 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
                     </div>
                     <div className="text-left">
                       <div className="font-semibold">Download ZIP</div>
-                      <div className="text-xs text-blue-200">
+                      <div
+                        className="text-xs"
+                        style={{ color: "rgba(255, 255, 255, 0.8)" }}
+                      >
                         Get all files as archive
                       </div>
                     </div>
@@ -1233,20 +1346,25 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
 
                   <button
                     onClick={handleSendToGitHub}
-                    className="bg-gray-900 hover:bg-gray-800 text-white p-4 rounded-xl font-medium transition-all duration-200 flex items-center gap-3 group hover:shadow-lg"
+                    className="text-white p-4 rounded-xl font-medium transition-all duration-200 flex items-center gap-3 group hover:shadow-lg hover:opacity-90"
+                    style={{
+                      background: `linear-gradient(135deg, ${projectColors.accent} 0%, ${projectColors.secondary} 100%)`,
+                    }}
                   >
-                    <div className="w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center group-hover:bg-gray-600 transition-colors">
-                      <svg
-                        className="w-5 h-5"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                      >
+                    <div
+                      className="w-10 h-10 rounded-lg flex items-center justify-center transition-colors"
+                      style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }}
+                    >
+                      <svg className="w-5 h-5" fill="white" viewBox="0 0 24 24">
                         <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
                       </svg>
                     </div>
                     <div className="text-left">
                       <div className="font-semibold">Push to GitHub</div>
-                      <div className="text-xs text-gray-400">
+                      <div
+                        className="text-xs"
+                        style={{ color: "rgba(255, 255, 255, 0.8)" }}
+                      >
                         Create repository
                       </div>
                     </div>
