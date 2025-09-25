@@ -6,7 +6,7 @@ import type { UserModel } from "./userModel";
  * It's recommended to use an environment variable for this.
  */
 const API_BASE_URL =
-  import.meta.env.IDEM_API_BASE_URL || "https://api.idem.africa";
+  import.meta.env.IDEM_API_BASE_URL || "http://localhost:3001";
 
 export async function getCurrentUser(): Promise<UserModel | null> {
   try {

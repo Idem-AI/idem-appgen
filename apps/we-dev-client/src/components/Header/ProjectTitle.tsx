@@ -30,7 +30,7 @@ export function ProjectTitle() {
         <img
           src={
             projectData?.analysisResultModel.branding.logo.variations.iconOnly
-              ?.lightBackground || "https://via.placeholder.com/32"
+              ?.lightBackground || ""
           }
           alt=""
           width={32}

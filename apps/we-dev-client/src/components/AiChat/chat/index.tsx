@@ -32,6 +32,7 @@ import { MCPTool } from "@/types/mcp";
 import useMCPTools from "@/hooks/useMCPTools";
 import { MultiChatPromptService } from "./services/multiChatPromptService";
 import { ProjectTutorial } from "../../Onboarding/ProjectTutorial";
+import { useLoading } from "../../loading";
 
 type WeMessages = (Message & {
   experimental_attachments?: Array<{
@@ -516,6 +517,8 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
   const [isGenerationComplete, setIsGenerationComplete] = useState(false);
   const [showGitHubButton, setShowGitHubButton] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [projectLoadError, setProjectLoadError] = useState<string | null>(null);
+  const { setLoading } = useLoading();
 
   // Load project data when projectId is present in URL
   // Does not automatically start generation
@@ -524,6 +527,9 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
       if (!projectId || isProjectLoaded) {
         return;
       }
+
+      setLoading(true);
+      setProjectLoadError(null);
 
       try {
         console.log("Loading project data with ID:", projectId);
@@ -548,17 +554,19 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
           }
         } else {
           console.warn("Project not found with ID:", projectId);
-          toast.error("Project not found");
+          setProjectLoadError("Project not found. Please check the project ID and try again.");
         }
       } catch (error) {
         console.error("Error loading project data:", error);
-        toast.error("Error loading project data");
+        setProjectLoadError("Failed to load project data. Please check your connection and try again.");
       } finally {
+        setLoading(false);
         setIsProjectLoaded(true);
 
-        // Check if tutorial should be shown
+        // Check if tutorial should be shown (only if project loaded successfully)
         if (
           projectId &&
+          projectData &&
           !localStorage.getItem(`tutorial_completed_${projectId}`)
         ) {
           setShowTutorial(true);
@@ -567,7 +575,7 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
     };
 
     loadProjectData();
-  }, [projectId]);
+  }, [projectId, setLoading]);
 
   // Function to manually start generation
   const handleStartGeneration = async () => {
@@ -949,7 +957,45 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
     }
   };
 
+  // Function to retry loading project data
+  const retryLoadProject = () => {
+    setIsProjectLoaded(false);
+    setProjectLoadError(null);
+  };
+
   const showJsx = useMemo(() => {
+    // Show error state if project failed to load
+    if (projectLoadError) {
+      return (
+        <div className="flex-1 flex items-center justify-center px-4">
+          <div className="max-w-md w-full text-center">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6">
+              <div className="w-16 h-16 bg-red-100 dark:bg-red-900/40 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-red-900 dark:text-red-100 mb-2">
+                Failed to Load Project
+              </h3>
+              <p className="text-sm text-red-700 dark:text-red-300 mb-6">
+                {projectLoadError}
+              </p>
+              <button
+                onClick={retryLoadProject}
+                className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2 mx-auto"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Try Again
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div
         className="flex-1 overflow-y-auto px-1 py-2 message-container [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
@@ -1224,6 +1270,8 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
     isGenerationComplete,
     showGitHubButton,
     projectData,
+    projectLoadError,
+    retryLoadProject,
   ]);
 
   // show guide modal
