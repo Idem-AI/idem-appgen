@@ -8,11 +8,14 @@ interface TokenUsage {
 
 export async function getTokenUsage(token: string): Promise<TokenUsage | null> {
   try {
-    const response = await fetch(`${process.env.APP_BASE_URL}/api/tokens`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await fetch(
+      `${process.env.REACT_REACT_APP_BASE_URL}/api/tokens`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Failed to fetch token usage");

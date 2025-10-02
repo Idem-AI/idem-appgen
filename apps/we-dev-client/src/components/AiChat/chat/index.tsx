@@ -30,7 +30,6 @@ import {
 } from "@/api/persistence/db";
 import { MCPTool } from "@/types/mcp";
 import useMCPTools from "@/hooks/useMCPTools";
-import { MultiChatPromptService } from "./services/multiChatPromptService";
 import { ProjectTutorial } from "../../Onboarding/ProjectTutorial";
 import { useLoading } from "../../loading";
 import { ProjectModel } from "@/api/persistence/models/project.model";
@@ -70,7 +69,7 @@ export const excludeFiles = [
   "/miniprogram/components/weicon/index.css",
 ];
 
-const API_BASE = process.env.APP_BASE_URL;
+const API_BASE = process.env.REACT_REACT_APP_BASE_URL;
 console.log(API_BASE, "API_BASE");
 
 enum ModelTypes {
@@ -330,6 +329,16 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
   const { enabledMCPs } = useMCPTools();
   const baseChatUrl = `${API_BASE}`;
 
+  // Project data state - must be declared before useChat hook
+  const [projectData, setProjectData] = useState<ProjectModel | null>(null);
+  const [isProjectLoaded, setIsProjectLoaded] = useState(false);
+  const [showStartButton, setShowStartButton] = useState(false);
+  const [hasGeneration, setHasGeneration] = useState(false);
+  const [isGenerationComplete, setIsGenerationComplete] = useState(false);
+  const [showGitHubButton, setShowGitHubButton] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [projectLoadError, setProjectLoadError] = useState<string | null>(null);
+
   const [mcpTools, setMcpTools] = useState<MCPTool[]>([]);
   useEffect(() => {
     if (enabledMCPs && enabledMCPs.length > 0) {
@@ -381,6 +390,8 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
             parameters: tool.inputSchema,
           })),
         }),
+      // Send projectData to server if available
+      ...(projectData && { projectData }),
     },
     id: chatUuid,
     onResponse: async (response) => {
@@ -511,14 +522,6 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
     },
   });
   const { status, type, projectId } = useUrlData({ append });
-  const [projectData, setProjectData] = useState<ProjectModel | null>(null);
-  const [isProjectLoaded, setIsProjectLoaded] = useState(false);
-  const [showStartButton, setShowStartButton] = useState(false);
-  const [hasGeneration, setHasGeneration] = useState(false);
-  const [isGenerationComplete, setIsGenerationComplete] = useState(false);
-  const [showGitHubButton, setShowGitHubButton] = useState(false);
-  const [showTutorial, setShowTutorial] = useState(false);
-  const [projectLoadError, setProjectLoadError] = useState<string | null>(null);
   const { setLoading } = useLoading();
 
   // Extract project colors for theming
@@ -609,14 +612,12 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
     if (!projectData) return;
 
     try {
-      const webGenService = new MultiChatPromptService();
-      const projectPrompt = webGenService.generatePrompt(projectData);
-
-      // Send formatted prompt to chat
+      // Send simple message to chat - project data will be sent to server in body
+      // No need to generate the full prompt on client side anymore
       append({
         id: uuidv4(),
         role: "user",
-        content: projectPrompt,
+        content: "Start generation",
       });
 
       setShowStartButton(false);

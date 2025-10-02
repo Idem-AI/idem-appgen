@@ -107,7 +107,7 @@ interface ProjectModel {
   id?: string;
   name: string;
   description: string;
-  type: 'web' | 'mobile' | 'iot' | 'desktop';
+  type: "web" | "mobile" | "iot" | "desktop";
   analysisResultModel?: {
     development?: {
       configs?: {
@@ -178,9 +178,10 @@ const getExtraPrompt = (
 
   if (extra) {
     // Check if it's the new ProjectModel or legacy promptExtra
-    const ret = 'analysisResultModel' in extra 
-      ? resolveProjectConfig(extra as ProjectModel)
-      : resolveExtra(extra as promptExtra);
+    const ret =
+      "analysisResultModel" in extra
+        ? resolveProjectConfig(extra as ProjectModel)
+        : resolveExtra(extra as promptExtra);
     promptArr.unshift(...ret);
   }
 
@@ -242,7 +243,7 @@ function resolveExtra(extra: promptExtra) {
 function resolveProjectConfig(project: ProjectModel) {
   const promptArr = [];
   const developmentConfig = project.analysisResultModel?.development?.configs;
-  
+
   if (!developmentConfig) {
     return promptArr;
   }
@@ -257,26 +258,35 @@ function resolveProjectConfig(project: ProjectModel) {
       "IMPORTANT: You must generate backend code, do not only generate frontend code"
     );
     promptArr.push("IMPORTANT: Backend must handle CORS for all domains");
-    
-    const language = (backendConfig.language || "java").toLowerCase();
-    promptArr.push(`IMPORTANT: Use ${backendConfig.language} as the backend language with ${backendConfig.framework} framework.`);
-    promptArr.push(`IMPORTANT: Implement ${backendConfig.apiType} API endpoints.`);
-    
+
+    promptArr.push(
+      `IMPORTANT: Use ${backendConfig.language} as the backend language with ${backendConfig.framework} framework.`
+    );
+    promptArr.push(
+      `IMPORTANT: Implement ${backendConfig.apiType} API endpoints.`
+    );
+
     if (backendConfig.orm) {
-      promptArr.push(`IMPORTANT: Use ${backendConfig.orm} as ORM for database operations.`);
+      promptArr.push(
+        `IMPORTANT: Use ${backendConfig.orm} as ORM for database operations.`
+      );
     }
 
     // Backend features
     const backendFeatures = backendConfig.features;
     if (backendFeatures) {
       if (Array.isArray(backendFeatures)) {
-        backendFeatures.forEach(feature => {
-          promptArr.push(`IMPORTANT: Implement ${feature} functionality in the backend.`);
+        backendFeatures.forEach((feature) => {
+          promptArr.push(
+            `IMPORTANT: Implement ${feature} functionality in the backend.`
+          );
         });
       } else {
         Object.entries(backendFeatures).forEach(([feature, enabled]) => {
           if (enabled) {
-            promptArr.push(`IMPORTANT: Implement ${feature} functionality in the backend.`);
+            promptArr.push(
+              `IMPORTANT: Implement ${feature} functionality in the backend.`
+            );
           }
         });
       }
@@ -284,8 +294,15 @@ function resolveProjectConfig(project: ProjectModel) {
   }
 
   // Database configuration
-  if (databaseConfig && databaseConfig.provider && databaseConfig.provider !== 'none') {
-    const databasePromptArr = databaseeFunctionRegister[databaseConfig.provider.toLowerCase()]?.(project) || [];
+  if (
+    databaseConfig &&
+    databaseConfig.provider &&
+    databaseConfig.provider !== "none"
+  ) {
+    const databasePromptArr =
+      databaseeFunctionRegister[databaseConfig.provider.toLowerCase()]?.(
+        project
+      ) || [];
     promptArr.push(...databasePromptArr);
   } else {
     promptArr.push(
