@@ -58,7 +58,10 @@ export async function handleBuilderMode(
       const projectPrompt = projectPromptService.generatePrompt(projectData);
       
       // Replace the last message content with the generated prompt
-      messages[messages.length - 1].content = projectPrompt;
+      // Add XML output instructions (same as original logic)
+      messages[messages.length - 1].content = buildSystemPrompt(type, otherConfig) + 
+        'Note the requirements above, when writing code, do not give me markdown, output must be XML!! Emphasis!; My question is: ' + 
+        projectPrompt;
     } catch (error) {
       console.error('Error generating project prompt:', error);
       throw new Error(`Failed to generate project prompt: ${error instanceof Error ? error.message : 'Unknown error'}`);
