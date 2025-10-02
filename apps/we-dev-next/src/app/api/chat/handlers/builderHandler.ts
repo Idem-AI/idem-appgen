@@ -9,8 +9,8 @@ import {handleTokenLimit} from "../utils/tokenHandler";
 import {processFiles} from "../utils/fileProcessor";
 import {screenshotOne} from "../utils/screenshotone";
 import {promptExtra, ToolInfo} from "../prompt";
-import { ProjectModel } from "../types/project";
 import { ProjectPromptService } from "../services/projectPromptService";
+import { fetchProjectById } from "../services/projectApiService";
 
 export async function handleBuilderMode(
     messages: Messages,
@@ -18,7 +18,7 @@ export async function handleBuilderMode(
     userId: string | null,
     otherConfig: promptExtra,
     tools?: ToolInfo[],
-    projectData?: ProjectModel,
+    projectId?: string,
 ): Promise<Response> {
      const historyMessages = JSON.parse(JSON.stringify(messages));
   // Directory tree search
@@ -51,13 +51,25 @@ export async function handleBuilderMode(
   let nowFiles = files;
   const type = determineFileType(filesPath);
   
-  // If projectData is provided, generate prompt on server side
-  if (projectData) {
-    const projectPromptService = new ProjectPromptService();
-    const projectPrompt = projectPromptService.generatePrompt(projectData);
-    
-    // Replace the last message content with the generated prompt
-    messages[messages.length - 1].content = projectPrompt;
+  // If projectId is provided, fetch project data and generate prompt on server side
+  if (projectId) {
+    try {
+      // Fetch project data from IDEM API
+      const projectData = await fetchProjectById(projectId);
+      
+      if (!projectData) {
+        throw new Error(`Project not found: ${projectId}`);
+      }
+      
+      const projectPromptService = new ProjectPromptService();
+      const projectPrompt = projectPromptService.generatePrompt(projectData);
+      
+      // Replace the last message content with the generated prompt
+      messages[messages.length - 1].content = projectPrompt;
+    } catch (error) {
+      console.error('Error fetching project data:', error);
+      throw new Error(`Failed to fetch project data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   } else {
     // Original logic for non-project generation
     if (estimateTokens(allContent) > 128000) {

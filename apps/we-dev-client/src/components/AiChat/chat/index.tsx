@@ -69,7 +69,7 @@ export const excludeFiles = [
   "/miniprogram/components/weicon/index.css",
 ];
 
-const API_BASE = process.env.REACT_REACT_APP_BASE_URL;
+const API_BASE = process.env.REACT_APP_BASE_URL;
 console.log(API_BASE, "API_BASE");
 
 enum ModelTypes {
@@ -329,6 +329,12 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
   const { enabledMCPs } = useMCPTools();
   const baseChatUrl = `${API_BASE}`;
 
+  // Get projectId from URL - must be declared before useChat hook
+  const projectId = useMemo(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('projectId');
+  }, []);
+
   // Project data state - must be declared before useChat hook
   const [projectData, setProjectData] = useState<ProjectModel | null>(null);
   const [isProjectLoaded, setIsProjectLoaded] = useState(false);
@@ -390,8 +396,8 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
             parameters: tool.inputSchema,
           })),
         }),
-      // Send projectData to server if available
-      ...(projectData && { projectData }),
+      // Send projectId to server if available (server will fetch project data)
+      ...(projectId && { projectId }),
     },
     id: chatUuid,
     onResponse: async (response) => {
@@ -521,7 +527,9 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
       }
     },
   });
-  const { status, type, projectId } = useUrlData({ append });
+  
+  // Get status and type from URL data (projectId already obtained above)
+  const { status, type } = useUrlData({ append });
   const { setLoading } = useLoading();
 
   // Extract project colors for theming
