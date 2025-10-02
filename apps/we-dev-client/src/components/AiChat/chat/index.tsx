@@ -396,8 +396,8 @@ export const BaseChat = ({ uuid: propUuid }: { uuid?: string }) => {
             parameters: tool.inputSchema,
           })),
         }),
-      // Send projectId to server if available (server will fetch project data)
-      ...(projectId && { projectId }),
+      // Send projectData to server if available (client has auth, server doesn't)
+      ...(projectData && { projectData }),
     },
     id: chatUuid,
     onResponse: async (response) => {

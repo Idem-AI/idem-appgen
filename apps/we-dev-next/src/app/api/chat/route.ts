@@ -2,6 +2,7 @@ import {promptExtra, ToolInfo} from "./prompt";
 import {Messages} from "./action"
 import {handleBuilderMode} from "./handlers/builderHandler"
 import {handleChatMode} from "./handlers/chatHandler"
+import { ProjectModel } from "./types/project";
 
 enum ChatMode {
     Chat = "chat",
@@ -16,7 +17,7 @@ interface ChatRequest {
     mode: ChatMode;
     otherConfig: promptExtra
     tools?: ToolInfo[]
-    projectId?: string
+    projectData?: ProjectModel
 }
 
 export async function POST(request: Request) {
@@ -27,13 +28,13 @@ export async function POST(request: Request) {
             mode = ChatMode.Builder,
             otherConfig,
             tools,
-            projectId,
+            projectData,
         } = (await request.json()) as ChatRequest;
         const userId = request.headers.get("userId");
         const result =
             mode === ChatMode.Chat
                 ? await handleChatMode(messages, model, userId, tools)
-                : await handleBuilderMode(messages, model, userId, otherConfig, tools, projectId)
+                : await handleBuilderMode(messages, model, userId, otherConfig, tools, projectData)
         console.log(result, 'result');
         return result
     } catch (error) {
