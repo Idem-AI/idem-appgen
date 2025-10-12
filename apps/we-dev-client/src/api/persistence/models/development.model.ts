@@ -16,6 +16,9 @@ export interface DevelopmentConfigsModel {
           [key: string]: boolean | undefined;
         }
       | string[];
+    zipUrl?: string;
+    zipFilePath?: string;
+    lastUpdated?: string;
   };
 
   backend: {
@@ -41,6 +44,9 @@ export interface DevelopmentConfigsModel {
           [key: string]: boolean | undefined;
         }
       | string[];
+    zipUrl?: string;
+    zipFilePath?: string;
+    lastUpdated?: string;
   };
 
   database: {
